@@ -534,6 +534,8 @@ interpretStScope
                              Pure a -> a
 #+END_SRC
 
+Thus, in order to interpret an occurrence of $\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}$, we must essentially push the $(e \rightarrow t) \rightarrow t$ -type quantifier meaning down past the $\mathtt{get}_{\star ⤚ \gamma}$ and $\mathtt{put}_{\gamma ⤚ \star}$ of the resulting computation so that it may gain access to a continuation of type $e \rightarrow t$. One immediate result of this maneuver (which has been forced upon us by the types!) is that dynamic effects incurred within the quantifier's scope are lost outside of it. In other words, allowing quantifier meanings access to a scope of the right type forces a situation in which they may be live candidates for anaphora inside their scope, but not outside of it. We have thus derived (from their types!) that quantifier meanings are internally dynamic, but externally static, with respect to anaphora. This situation does not hold for ordinary anaphora, i.e., to individual-denoting expressions, whose side effects are captured by the resulting State-monadic algebra, rendering them dynamic. 
+
 * A linguistic example<<sec:a linguistic example>>
 
 $\begin{align*}

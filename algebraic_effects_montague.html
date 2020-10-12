@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-12 Mon 19:23 -->
+<!-- 2020-10-12 Mon 19:41 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Algebraic effects in Montague semantics</title>
@@ -265,22 +265,22 @@ append: ["#1\\!\\!::\\!\\!#2",2]
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org80fcb31">1. Algebraic effects</a></li>
-<li><a href="#orgca5f32f">2. Making it Montagovian</a>
+<li><a href="#orgc4bb0f4">1. Algebraic effects</a></li>
+<li><a href="#orgdf7b83d">2. Making it Montagovian</a>
 <ul>
-<li><a href="#org30bc27e">2.1. Computation types</a></li>
-<li><a href="#org6bf146b">2.2. Graded monads</a></li>
-<li><a href="#org6d827e3">2.3. Operations</a>
+<li><a href="#orgf3c1213">2.1. Computation types</a></li>
+<li><a href="#org92d1cf2">2.2. Graded monads</a></li>
+<li><a href="#org5f4e9ea">2.3. Operations</a>
 <ul>
-<li><a href="#org220dce2">2.3.1. State</a></li>
-<li><a href="#org5b7912c">2.3.2. Quantification</a></li>
+<li><a href="#org2519c17">2.3.1. State</a></li>
+<li><a href="#org25b1c74">2.3.2. Quantification</a></li>
 </ul>
 </li>
-<li><a href="#org1c72bd4">2.4. Handlers</a></li>
+<li><a href="#orgb5cd049">2.4. Handlers</a></li>
 </ul>
 </li>
-<li><a href="#orgdf9639a">3. A linguistic example</a></li>
-<li><a href="#orgd21b5ca">4. Summary</a></li>
+<li><a href="#orga9713ad">3. A linguistic example</a></li>
+<li><a href="#orga3af37b">4. Summary</a></li>
 </ul>
 </div>
 </div>
@@ -289,15 +289,15 @@ Algebraic effects and handlers provide an approach to implementing computational
 </p>
 
 <p>
-In this post, I'll experiment a little bit with the algebraic approach in the context of modeling linguistic side effects. Jirka Maršík has done significant work studying semantic phenomena from the perspective of algebraic effects and handlers, culminating in his <a href="https://hal.inria.fr/tel-01417467">2016 PhD thesis</a> (see [<a href="#marsik_algebraic_2014">Maršík and Amblard, 2014</a>,<a href="#marsik_introducing_2016">Maršík and Amblard, 2016</a>,<a href="#marsik_effects_2016">Maršík, 2016</a>]). This work, whose main features I'll briefly summarize in &sect;<a href="#org5bbfb63">1</a>, is cast within a typed extension of the &lambda;-calculus designed for algebraic effects. Maršík's work departs somewhat from the denotational view of meaning semanticists in the Montagovian tradition are typically accustomed to, at least on its face. He provides an operational semantics for the extended language, which includes operations and handlers, among other constructs. The semantics allows the representations provided in the extended language to be transformed into more familiar ones denoting ordinary truth-conditions (represented by simply typed &lambda;-terms). The process of mapping expressions of the extended language into the STLC, however, involves sacrificing the usual Montagovian view of the meanings of their component parts.<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup> 
+In this post, I'll experiment a little bit with the algebraic approach in the context of modeling linguistic side effects. Jirka Maršík has done significant work studying semantic phenomena from the perspective of algebraic effects and handlers, culminating in his <a href="https://hal.inria.fr/tel-01417467">2016 PhD thesis</a> (see [<a href="#marsik_algebraic_2014">Maršík and Amblard, 2014</a>,<a href="#marsik_introducing_2016">Maršík and Amblard, 2016</a>,<a href="#marsik_effects_2016">Maršík, 2016</a>]). This work, whose main features I'll briefly summarize in &sect;<a href="#org9243cfe">1</a>, is cast within a typed extension of the &lambda;-calculus designed for algebraic effects. Maršík's work departs somewhat from the denotational view of meaning semanticists in the Montagovian tradition are typically accustomed to, at least on its face. He provides an operational semantics for the extended language, which includes operations and handlers, among other constructs. The semantics allows the representations provided in the extended language to be transformed into more familiar ones denoting ordinary truth-conditions (represented by simply typed &lambda;-terms). The process of mapping expressions of the extended language into the STLC, however, involves sacrificing the usual Montagovian view of the meanings of their component parts.<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup> 
 </p>
 
 <p>
-I will mainly use this post is to explore how similar ideas may be expressed in a more traditional Montagovian setting. &sect;<a href="#org13fb9c7">2</a> begins an attempt in this direction with a framework having much of the functionality of the algebraic effects approach, cast within the simply typed &lambda;-calculus (including products). The basic strategy explored is one which views algebraic operations as variables bound (and thus given meaning) by their handlers. This view of operations allows them to be recast as &lambda;-abstractions, giving rise to an interpretation scheme on which operations denote functions on their handlers. The proposals have been implemented in Haskell, and relevant parts of the text are accompanied by their corresponding Haskell code. The full code is available <a href="https://github.com/juliangrove/algebraic-effects-montague">here</a>.
+I will mainly use this post is to explore how similar ideas may be expressed in a more traditional Montagovian setting. &sect;<a href="#orgc1fb4d7">2</a> begins an attempt in this direction with a framework having much of the functionality of the algebraic effects approach, cast within the simply typed &lambda;-calculus (including products). The basic strategy explored is one which views algebraic operations as variables bound (and thus given meaning) by their handlers. This view of operations allows them to be recast as &lambda;-abstractions, giving rise to an interpretation scheme on which operations denote functions on their handlers. The proposals have been implemented in Haskell, and relevant parts of the text are accompanied by their corresponding Haskell code. The full code is available <a href="https://github.com/juliangrove/algebraic-effects-montague">here</a>.
 </p>
 
-<div id="outline-container-org80fcb31" class="outline-2">
-<h2 id="org80fcb31"><span class="section-number-2">1</span> Algebraic effects<a id="org5bbfb63"></a></h2>
+<div id="outline-container-orgc4bb0f4" class="outline-2">
+<h2 id="orgc4bb0f4"><span class="section-number-2">1</span> Algebraic effects<a id="org9243cfe"></a></h2>
 <div class="outline-text-2" id="text-1">
 <p>
 The basic features of Maršík's approach are presented in the papers [<a href="#marsik_algebraic_2014">Maršík and Amblard, 2014</a>,<a href="#marsik_introducing_2016">Maršík and Amblard, 2016</a>], as well as in the first chapter of <a href="https://hal.inria.fr/tel-01417467">his thesis</a>. In addition to the expressions of the simply typed &lambda;-calculus, Maršík includes the constructs <i>injection</i>, <i>operation</i>, <i>handler</i>, <i>extraction</i>, and <i>exchange</i>. Unlike the simply typed fragment of his language, these constructs have types involving (for value types \(\alpha\)) the computation types \(\mathcal{F}(\alpha)\), providing the types of expressions with algebraic effects. The type of any computation with algebraic effects is indexed by an <i>effect signature</i>; that is, a set of operation symbols, along with an assignment of types to these operation symbols that indicate any parameters the associated operation takes, as well as the operation's arity. The signature that indexes the type of a computation describes the collection of operations that <i>may</i> be invoked in the computation. For example, the computation type \(\mathcal{F}_{\{\mathtt{op} : p ⤚ a\}}(\alpha)\) is the type of computations which may invoke the operation \(\mathtt{op}\) (which takes parameters of type \(p\) and which has arity \(a\)), in order to return values of type \(\alpha\).  
@@ -497,8 +497,8 @@ So far, we have illustrated the algebraic approach to linguistic side effects in
 </div>
 </div>
 
-<div id="outline-container-orgca5f32f" class="outline-2">
-<h2 id="orgca5f32f"><span class="section-number-2">2</span> Making it Montagovian<a id="org13fb9c7"></a></h2>
+<div id="outline-container-orgdf7b83d" class="outline-2">
+<h2 id="orgdf7b83d"><span class="section-number-2">2</span> Making it Montagovian<a id="orgc1fb4d7"></a></h2>
 <div class="outline-text-2" id="text-2">
 <p>
 We'll attempt here to render some of the ideas illustrated above in the more familiar setting provided by the simply typed &lambda;-calculus (with products). The proposals of this section have been implemented as runnable Haskell code, which is available in full <a href="https://github.com/juliangrove/algebraic-effects-montague">here</a>, and relevant parts of which are presented throughout. Note that the following language pragmas are needed for the implementation of algebraic effects and handlers.
@@ -521,8 +521,8 @@ We'll attempt here to render some of the ideas illustrated above in the more fam
 </div>
 </div>
 
-<div id="outline-container-org30bc27e" class="outline-3">
-<h3 id="org30bc27e"><span class="section-number-3">2.1</span> Computation types</h3>
+<div id="outline-container-orgf3c1213" class="outline-3">
+<h3 id="orgf3c1213"><span class="section-number-3">2.1</span> Computation types</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 To start, we'll define our computation types as values of a function \(\mathcal{F}_l(v)\), where \(l\) is a parameter consisting of a list of types of the form \(p_i ⤚ a_i\). \(\mathcal{F}_l(v)\) is defined as follows, where \(\epsilon\) is the empty list, and \(o\) is an arbitrary type. (Thus, fixing \(v\), computation types act like equivalence classes of simple types that are agnostic about what \(o\) is).
@@ -557,7 +557,7 @@ If we set \(v\) to the type \(t\) of truth values, a term of this type might be 
 </p>
 
 <p>
-Such a format for representing computations may look reminiscent of the system presented in &sect;<a href="#org5bbfb63">1</a>, but with two crucially new conventions. First, operations are now represented by &lambda;-abstracted variables. The choice of variable name \(h\) is meant to suggest that operations act as functions on their handlers; indeed, interpreting an operation in terms of a handler, from this perspective, is just a matter of passing the handler to the operation (encoded as a &lambda;-abstraction). Second, the parameters of computation types now explicitly represent how many times particular operations are invoked, and in what order. The computation type \(\mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e, (e \rightarrow t) \rightarrow t ⤚ e}(t)\), for instance, is the type of a computation which invokes the \(\mathtt{scope}\) operation <i>twice</i> before returning a value of type \(t\).
+Such a format for representing computations may look reminiscent of the system presented in &sect;<a href="#org9243cfe">1</a>, but with two crucially new conventions. First, operations are now represented by &lambda;-abstracted variables. The choice of variable name \(h\) is meant to suggest that operations act as functions on their handlers; indeed, interpreting an operation in terms of a handler, from this perspective, is just a matter of passing the handler to the operation (encoded as a &lambda;-abstraction). Second, the parameters of computation types now explicitly represent how many times particular operations are invoked, and in what order. The computation type \(\mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e, (e \rightarrow t) \rightarrow t ⤚ e}(t)\), for instance, is the type of a computation which invokes the \(\mathtt{scope}\) operation <i>twice</i> before returning a value of type \(t\).
 </p>
 
 <p>
@@ -581,13 +581,13 @@ We have two constructors: <i>Pure</i>, for trivial (i.e., pure) computations tha
 </p>
 
 <p>
-Given our encoding of computations with algebraic effects into the simply typed &lambda;-calculus, we ought to provide a way of composing them analogous to what we had in &sect;<a href="#org5bbfb63">1</a>. Fortunately, the relevant compositional scheme is straightforward: just as algebraic effects normally give rise to monads, our encoding gives rise to graded monads.
+Given our encoding of computations with algebraic effects into the simply typed &lambda;-calculus, we ought to provide a way of composing them analogous to what we had in &sect;<a href="#org9243cfe">1</a>. Fortunately, the relevant compositional scheme is straightforward: just as algebraic effects normally give rise to monads, our encoding gives rise to graded monads.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org6bf146b" class="outline-3">
-<h3 id="org6bf146b"><span class="section-number-3">2.2</span> Graded monads</h3>
+<div id="outline-container-org92d1cf2" class="outline-3">
+<h3 id="org92d1cf2"><span class="section-number-3">2.2</span> Graded monads</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Graded monads generalize monads in order to associate with each computation type an <i>effect</i> that parameterizes it with fine-grained information about the nature of the relevant side effect. Concretely, a graded monad is a family of functors \(G : \mathcal{E} \rightarrow \mathcal{T} \rightarrow \mathcal{T}\), parameterized by a monoid \(\mathcal{E}\) of effects. Then given some \(e \in \mathcal{E}\), \(G_e\) is an endofunctor on the category \(\mathcal{T}\) of types. Associated with each graded monad are two operators, \((\cdot)^\eta\) and \(\bind\), having the following type-signatures (where \(\mathtt{0}\) and \(+\) are, respectively, the identity and associative operation of the monoid \(\mathcal{E}\)).
@@ -672,11 +672,11 @@ In Haskell, we may write the corresponding instance for the <i>Effect</i> class 
 </div>
 </div>
 
-<div id="outline-container-org6d827e3" class="outline-3">
-<h3 id="org6d827e3"><span class="section-number-3">2.3</span> Operations</h3>
+<div id="outline-container-org5f4e9ea" class="outline-3">
+<h3 id="org5f4e9ea"><span class="section-number-3">2.3</span> Operations</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
-At this point, it is useful to define the operations that will be the basis of the linguistic example presented &sect;<a href="#org9ed13cd">3</a>. We can understand operations associated with the type \(p ⤚ a\) as simply typed &lambda;-terms with the following type (where \(v\) is an arbitrary value type and \(l\) may be any effect).
+At this point, it is useful to define the operations that will be the basis of the linguistic example presented &sect;<a href="#org008cff9">3</a>. We can understand operations associated with the type \(p ⤚ a\) as simply typed &lambda;-terms with the following type (where \(v\) is an arbitrary value type and \(l\) may be any effect).
 </p>
 
 <p>
@@ -739,12 +739,12 @@ That is, the computation invokes the operation and continues with the <i>return<
 </p>
 
 <p>
-For the linguistic example we consider in &sect;<a href="#org9ed13cd">3</a>, we will deal specifically with the operations associated with <i>state</i> (&sect;<a href="#org598bdd7">2.3.1</a>) and <i>quantification</i> (&sect;<a href="#org4baa553">2.3.2</a>).
+For the linguistic example we consider in &sect;<a href="#org008cff9">3</a>, we will deal specifically with the operations associated with <i>state</i> (&sect;<a href="#org9f1c15b">2.3.1</a>) and <i>quantification</i> (&sect;<a href="#org5f456ce">2.3.2</a>).
 </p>
 </div>
 
-<div id="outline-container-org220dce2" class="outline-4">
-<h4 id="org220dce2"><span class="section-number-4">2.3.1</span> State<a id="org598bdd7"></a></h4>
+<div id="outline-container-org2519c17" class="outline-4">
+<h4 id="org2519c17"><span class="section-number-4">2.3.1</span> State<a id="org9f1c15b"></a></h4>
 <div class="outline-text-4" id="text-2-3-1">
 <p>
 The state algebra consists of operations for reading from and writing to an environment of some designated type. Given a type \(s\) of the environment, there are two state operations, \(\mathtt{get}_{\star ⤚ s}\), which reads from the environment, and \(\mathtt{put}_{s ⤚ \star}\), which writes to the environment. (Recall that \(\star\) is the unit type; it is inhabited by a single element, also called \(\star\).) In our linguistic example, we'll use these operations to manage anaphora. Thus we can take the environment to be a list of individuals, whose type we'll call \(\gamma\) (following [<a href="#degroote_towards_2006">de&nbsp;Groote, 2006</a>]).
@@ -825,11 +825,11 @@ Thus \((\cdot)^\triangleright\) reads in the entity returned by its input, gets 
 </div>
 </div>
 
-<div id="outline-container-org5b7912c" class="outline-4">
-<h4 id="org5b7912c"><span class="section-number-4">2.3.2</span> Quantification<a id="org4baa553"></a></h4>
+<div id="outline-container-org25b1c74" class="outline-4">
+<h4 id="org25b1c74"><span class="section-number-4">2.3.2</span> Quantification<a id="org5f456ce"></a></h4>
 <div class="outline-text-4" id="text-2-3-2">
 <p>
-To add quantification to the grammar, we'll use an operation \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\), analogous to the identically named operation of &sect;<a href="#org5bbfb63">1</a>. The following definitions of \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) and its corresponding computation, \(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e}\), are determined by the associated parameter and arity.
+To add quantification to the grammar, we'll use an operation \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\), analogous to the identically named operation of &sect;<a href="#org9243cfe">1</a>. The following definitions of \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) and its corresponding computation, \(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e}\), are determined by the associated parameter and arity.
 </p>
 
 <p>
@@ -860,11 +860,11 @@ The \(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e}\) computatio
 </div>
 </div>
 
-<div id="outline-container-org1c72bd4" class="outline-3">
-<h3 id="org1c72bd4"><span class="section-number-3">2.4</span> Handlers</h3>
+<div id="outline-container-orgb5cd049" class="outline-3">
+<h3 id="orgb5cd049"><span class="section-number-3">2.4</span> Handlers</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
-In total we have three operations, \(\mathtt{get}_{\star ⤚ \gamma}\), \(\mathtt{put}_{\gamma ⤚ \star}\), and \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\); what we need now is a way to handle them. Recall from &sect;<a href="#org5bbfb63">1</a> that handlers have the following shape,
+In total we have three operations, \(\mathtt{get}_{\star ⤚ \gamma}\), \(\mathtt{put}_{\gamma ⤚ \star}\), and \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\); what we need now is a way to handle them. Recall from &sect;<a href="#org9243cfe">1</a> that handlers have the following shape,
 </p>
 
 <p>
@@ -1038,12 +1038,16 @@ Finally, we have the following interpretation for \(\mathtt{scope}_{(e \rightarr
                              <span style="color: #d3869b;">Pure</span> a <span style="color: #83a598;">-&gt;</span> a
 </pre>
 </div>
+
+<p>
+Thus, in order to interpret an occurrence of \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\), we must essentially push the \((e \rightarrow t) \rightarrow t\) -type quantifier meaning down past the \(\mathtt{get}_{\star ⤚ \gamma}\) and \(\mathtt{put}_{\gamma ⤚ \star}\) of the resulting computation so that it may gain access to a continuation of type \(e \rightarrow t\). One immediate result of this maneuver (which has been forced upon us by the types!) is that dynamic effects incurred within the quantifier's scope are lost outside of it. In other words, allowing quantifier meanings access to a scope of the right type forces a situation in which they may be live candidates for anaphora inside their scope, but not outside of it. We have thus derived (from their types!) that quantifier meanings are internally dynamic, but externally static, with respect to anaphora. This situation does not hold for ordinary anaphora, i.e., to individual-denoting expressions, whose side effects are captured by the resulting State-monadic algebra, rendering them dynamic. 
+</p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgdf9639a" class="outline-2">
-<h2 id="orgdf9639a"><span class="section-number-2">3</span> A linguistic example<a id="org9ed13cd"></a></h2>
+<div id="outline-container-orga9713ad" class="outline-2">
+<h2 id="orga9713ad"><span class="section-number-2">3</span> A linguistic example<a id="org008cff9"></a></h2>
 <div class="outline-text-2" id="text-3">
 <p>
 \(\begin{align*}
@@ -1079,8 +1083,8 @@ m <span style="color: #fabd2f;">&lt;|</span> n <span style="color: #83a598;">=</
 </div>
 </div>
 
-<div id="outline-container-orgd21b5ca" class="outline-2">
-<h2 id="orgd21b5ca"><span class="section-number-2">4</span> Summary</h2>
+<div id="outline-container-orga3af37b" class="outline-2">
+<h2 id="orga3af37b"><span class="section-number-2">4</span> Summary</h2>
 <div class="outline-text-2" id="text-4">
 <div id="bibliography">
 <h2>References</h2>
@@ -1402,7 +1406,7 @@ Keywords: Computer Science - Programming Languages, Computer Science - Computati
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Julian Grove</p>
-<p class="date">Created: 2020-10-12 Mon 19:23</p>
+<p class="date">Created: 2020-10-12 Mon 19:41</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

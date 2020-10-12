@@ -563,6 +563,4 @@ m |> n = join $ fmap (\f -> fmap (\x -> f x) n) m
 m <| n = join $ fmap (\x -> fmap (\f -> f x) n) m
 #+END_SRC
 
-* Quantifiers as handlers
-
 #+BIBLIOGRAPHY: algebraic_effects_montague apalike

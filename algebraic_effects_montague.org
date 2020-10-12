@@ -515,8 +515,8 @@ Finally, we have the following interpretation for $\mathtt{scope}_{(e \rightarro
 
 $$\begin{align*}
 \mathtt{interpretStScope} &: ((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
-\mathtt{interpretStScope} &= \lambda g, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g^\prime.k \star (\lambda\star, k^\prime.k^\prime g))\\
-(\ &= \lambda g, k, h.h \star (\lambda g^\prime.k \star (\lambda\star, k^\prime.k^\prime g))\ \ )
+\mathtt{interpretStScope} &= \lambda q, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.q (\lambda x.k x (\lambda g^\prime, k^\prime.k^\prime g (\lambda\star, k^{\prime\prime}.k^{\prime\prime} \star)))))\\
+(\ &= \lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.k x (\lambda g^\prime, k^\prime.k^\prime g (\lambda\star, k^{\prime\prime}.k^{\prime\prime} \star)))))\ \ )
 \end{align*}$$
 
 #+BEGIN_SRC haskell

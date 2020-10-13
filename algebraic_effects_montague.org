@@ -229,7 +229,7 @@ $$\begin{align*}
 
 These operators are required to satisfy the /graded monad laws/, which are identical in form to the laws for ordinary monads, modulo the manipulation of effects.[fn:: In particular, the laws entail that the parameters form a monoid, as stipulated.]
 
-In our case, the relevant graded monad consists of the function $\mathcal{F} : \mathcal{T}^* \rightarrow \mathcal{T} \rightarrow \mathcal{T}$, whose effects are given by $\mathcal{T}^*$, the free monoid (i.e., of lists) over $\mathcal{T}$ (viewed as a set). Given any effect $l$, $\mathcal{F}_l$ is indeed a functor, as witnessed by the following definition of $\mathtt{map}_{\mathcal{F}_l}$.
+In our case, the relevant graded monad consists of the function $\mathcal{F} : {\mathcal{T}_⤚}^* \rightarrow \mathcal{T} \rightarrow \mathcal{T}$, whose effects are given by ${\mathcal{T}_⤚}^*$, the free monoid (i.e., of lists) over $\mathcal{T}_⤚ = \{p ⤚ a \divd p, a \in \mathcal{T}\}$. Given any effect $l \in {\mathcal{T}_⤚}^*$, $\mathcal{F}_l$ is indeed a functor, as witnessed by the following definition of $\mathtt{map}_{\mathcal{F}_l}$.
 
 $$\begin{align*}
 \mathtt{map}_{\mathcal{F}_l} &: (v \rightarrow w) \rightarrow \mathcal{F}_l(v) \rightarrow \mathcal{F}_l(w)\\
@@ -421,7 +421,14 @@ It helps to show the encoding of a handler by first representing it as a tuple h
 
 $$\langle M_1, \ldots, M_{|I|}, N\rangle$$
 
-The tuple provides a kind of middleman while we build the \lambda-term corresponding to the handler. To encode the handler, we'll need the ability to retrieve the components of this tuple when the encoding requires them. This scheme can be implemented in Haskell in terms of the following class.
+The tuple provides a kind of middleman while we build the \lambda-term corresponding to the handler. To encode the handler, we'll need the ability to retrieve the components of this tuple when the encoding requires them. Thus we'll require the following function, $\mathtt{retrieve}$.
+
+$$\begin{align*}
+\mathtt{retrieve} &: m_1 \times \ldots \times m_{|I|} \times n \rightarrow o\ \ (\text{where}\ o \in \{m_1, \ldots, m_{|I|}, n\})\\
+\mathtt{retrieve} \langle\ldots O \ldots\rangle &= O
+\end{align*}$$
+
+This scheme can be implemented in Haskell in terms of the following class.
 
 #+BEGIN_SRC haskell
 -- | The class of handlers whose individual interpreters may be retrieved.
@@ -450,7 +457,13 @@ Such simpler computations are "fully interpreted", insofar as they correspond ex
 
 $$\lambda g.(v, g^\prime)$$
 
-Accordingly, we will interpret values by simply returning them in (our encoding of) the State monad.
+Accordingly, we will interpret values by simply returning them in (our encoding of) the State monad; that is, using the following interpreter.
+
+$$\begin{align*}
+\mathtt{interpretStVal} &: v \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)\\
+\mathtt{interpretStVal} &= \lambda v.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.v))\\
+&= \lambda v, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.v))
+\end{align*}$$
 
 #+BEGIN_SRC haskell
 type InterpretStVal v = InterpretVal '[() >-- [Entity], [Entity] >-- ()] v v
@@ -515,8 +528,8 @@ Finally, we have the following interpretation for $\mathtt{scope}_{(e \rightarro
 
 $$\begin{align*}
 \mathtt{interpretStScope} &: ((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
-\mathtt{interpretStScope} &= \lambda q, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.q (\lambda x.k x (\lambda g^\prime, k^\prime.k^\prime g (\lambda\star, k^{\prime\prime}.k^{\prime\prime} \star)))))\\
-(\ &= \lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.k x (\lambda g^\prime, k^\prime.k^\prime g (\lambda\star, k^{\prime\prime}.k^{\prime\prime} \star)))))\ \ )
+\mathtt{interpretStScope} &= \lambda q, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.q (\lambda x.k x (\lambda\star, k^\prime.k^\prime g (\lambda g^\prime, k^{\prime\prime}.k^{\prime\prime} \star)))))\\
+(\ &= \lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.k x (\lambda\star, k^\prime.k^\prime g (\lambda g^\prime, k^{\prime\prime}.k^{\prime\prime} \star)))))\ \ )
 \end{align*}$$
 
 #+BEGIN_SRC haskell
@@ -534,7 +547,176 @@ interpretStScope
                              Pure a -> a
 #+END_SRC
 
-Thus, in order to interpret an occurrence of $\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}$, we must essentially push the $(e \rightarrow t) \rightarrow t$ -type quantifier meaning down past the $\mathtt{get}_{\star ⤚ \gamma}$ and $\mathtt{put}_{\gamma ⤚ \star}$ of the resulting computation so that it may gain access to a continuation of type $e \rightarrow t$. One immediate result of this maneuver (which has been forced upon us by the types!) is that dynamic effects incurred within the quantifier's scope are lost outside of it. In other words, allowing quantifier meanings access to a scope of the right type forces a situation in which they may be live candidates for anaphora inside their scope, but not outside of it. We have thus derived (from their types!) that quantifier meanings are internally dynamic, but externally static, with respect to anaphora. This situation does not hold for ordinary anaphora, i.e., to individual-denoting expressions, whose side effects are captured by the resulting State-monadic algebra, rendering them dynamic. 
+Thus, in order to interpret an occurrence of $\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}$, we must essentially push the $(e \rightarrow t) \rightarrow t$ -type quantifier meaning down past the $\mathtt{get}_{\star ⤚ \gamma}$ and $\mathtt{put}_{\gamma ⤚ \star}$ of the resulting computation so that it may gain access to a continuation of type $e \rightarrow t$. The implication of using such an interpreter for $\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}$ effects is that quantifier meanings may only be handled inside computations whose value type is $t$, i.e., at sentence boundaries. An immediate consequence of pushing quantifier meanings down past $\mathtt{get}_{\star ⤚ \gamma}$ and $\mathtt{put}_{\gamma ⤚ \star}$ (a maneuver which has been forced upon us by the types!) is that dynamic effects incurred within the quantifier's scope are lost outside of it. In other words, allowing quantifier meanings access to a scope of the right type forces a situation in which they may be live candidates for anaphora inside of their scope, but not outside of it. We have thus derived (from their types!) that quantifier meanings are internally dynamic, but externally static, with respect to anaphora. This situation does not hold for ordinary anaphora, i.e., to individual-denoting expressions, whose side effects are captured in the resulting State-monadic algebra, rendering them dynamic.[fn:: Such considerations suggest that indefinites, which give rise to exceptional scope, /should not/ be analyzed as generalized quantifiers within our fragment, but, rather, as something else. It might be beneficial to try to add a version of non-determinism to the signature, in the vein of cite:charlow_semantics_2014.]
+
+We may now construct the tuple determining our handler as follows.
+
+$$\begin{align*}
+\mathtt{getPutScopeHandler} = \langle&\mathtt{interpretStGet},\\
+&\mathtt{interpretStPut},\\
+&\mathtt{interpretStScope},\\
+&\mathtt{interpretStVal}\rangle
+\end{align*}$$
+
+#+BEGIN_SRC haskell
+-- | The type of handlers for computations possibly featuring 'get', 'put', and
+-- 'scope'.
+type GetPutScopeHandler
+  = (InterpretGet Bool,
+      (InterpretPut Bool,
+        (InterpretScope,
+          InterpretStVal Bool)))
+                                                    
+-- | A handler for computations possibly featuring 'get', 'put', and 'scope'.
+getPutScopeHandler :: GetPutScopeHandler
+getPutScopeHandler = (interpretStGet,
+                       (interpretStPut,
+                         (interpretStScope,
+                           interpretStVal)))
+#+END_SRC
+
+In order to correctly retrieve an interpreter from a handler, we must define the following instances of the /Retrievable/ class in Haskell (there are eleven total!).[fn:: This number of instances may seem excessive, but it seems to be required to make the $\mathtt{retrieve}$ operation as general as possible without incurring an /OverlappingInstances/ violation.]
+
+#+BEGIN_SRC haskell
+-- | When a handler has only one component.
+instance Retrievable interpreter interpreter where
+  retrieve = id
+
+-- | Access the first component of a handler.
+instance Retrievable interpreter (interpreter, handler) where
+  retrieve = fst
+
+-- | Look past the first component to retrieve an interpreter from inside the
+-- second component.
+instance Retrievable (InterpretStVal v) handler
+      => Retrievable (InterpretStVal v) (InterpretGet v, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable (InterpretStVal v) handler
+      => Retrievable (InterpretStVal v) (InterpretPut v, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable (InterpretStVal v) handler
+      => Retrievable (InterpretStVal v) (InterpretScope, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable (InterpretGet v) handler
+      => Retrievable (InterpretGet v) (InterpretPut v, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable (InterpretGet v) handler
+      => Retrievable (InterpretGet v) (InterpretScope, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable (InterpretPut v) handler
+      => Retrievable (InterpretPut v) (InterpretGet v, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable (InterpretPut v) handler
+      => Retrievable (InterpretPut v) (InterpretScope, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable InterpretScope handler
+      => Retrievable InterpretScope (InterpretGet v, handler) where
+  retrieve = retrieve . snd
+
+-- | Look past the first component to retrieve a handler from inside the
+-- second component.
+instance Retrievable InterpretScope handler
+      => Retrievable InterpretScope (InterpretPut v, handler) where
+  retrieve = retrieve . snd
+#+END_SRC
+
+With these components, defining a handler for our effects is straightforward. In particular, we may define the following partial function, $\mathtt{handle}$, from tuples to \lambda-terms.
+
+$$\begin{align*}
+\mathtt{handle} &: m_1 \times \ldots \times m_{|I|} \times n \rightarrow \mathcal{F}_{l_{in}}(v_{in}) \rightarrow \mathcal{F}_{l_{out}}(v_{out})
+\end{align*}$$
+
+As in \S[[sec:algebraic effects]], the semantics of effect handling is defined by an /injection/ case and an /operation/ case. These correspond to the following two definitions of $\mathtt{handle}$, depending on whether the computation it handles invokes operations or merely returns a value. (Note that we're ignoring the case in which a handler passes over an operation it doesn't handle, since it is currently irrelevant for our purposes.)
+
+$$\begin{align*}
+\mathtt{handle} h v &= \mathtt{retrieve} h v\tag{injection}\\
+\mathtt{handle} h m &= m (\lambda p, k.\mathtt{retrieve} h p (\lambda a.\mathtt{handle} h (k a)))\tag{operation}
+\end{align*}$$
+
+In Haskell, we may define a corresponding /Handleable/ class, along with the two relevant instances for injections and operations (note that we invoke type applications, along with the /ScopedTypeVariables/ language extension, to fix the right type for $\mathtt{retrieve}$ when handling an operation).
+
+#+BEGIN_SRC haskell
+-- | The class of handleable effects. Handle a computation associated with the
+-- list of effects l1 and value type v1 to turn it into a computation associated
+-- with the list of effects l2 and value type v2, in a way that depends on the
+-- given handler.
+class Handleable handler l1 l2 v1 v2 where
+  handle :: handler -> F l1 v1 -> F l2 v2
+
+-- | Handle a value.
+instance Retrievable (InterpretStVal v) handler
+      => Handleable handler '[] '[() >-- [Entity], [Entity] >-- ()] v v where
+  handle handler (Pure v) = retrieve handler v
+
+-- | Handle an operation.
+instance (Retrievable (InterpretStOp p a v) handler,
+          Handleable handler l '[() >-- [Entity], [Entity] >-- ()] v v)
+      => Handleable handler (p >-- a ': l)
+         '[() >-- [Entity], [Entity] >-- ()] v v where
+  handle handler (Impure m)
+    = m $ \p k -> retrieve @(InterpretStOp p a v) handler
+                  p (\a -> handle handler (k a))
+#+END_SRC
+
+At the end of the day, we may define the handler for our fragment as a family of \lambda-terms indexed by the set $\{\star ⤚ \gamma, \gamma ⤚ \star, (e \rightarrow t) \rightarrow t ⤚ e\}^*$, i.e., of effects built up only from the types associated with our three operations. Given an effect $l$ from this set, we may define our handler as follows.
+
+$$\begin{align*}
+\mathtt{handleSentence}_l &: \mathcal{F}_l(t) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
+\mathtt{handleSentence}_l &= \mathtt{handle}\ \mathtt{getPutScopeHandler}
+\end{align*}$$
+
+#+BEGIN_SRC haskell
+-- | Handle a sentence with effects, using a 'GetPutScopeHandler'.
+handleSentence :: Handleable GetPutScopeHandler l
+                  '[() >-- [Entity], [Entity] >-- ()] Bool Bool
+               => F l Bool -> F '[() >-- [Entity], [Entity] >-- ()] Bool
+handleSentence = handle getPutScopeHandler
+#+END_SRC
+
+Note that, because the handler handles quantifier meanings, it is only applicable at computations with return values of type $t$. That said, any given effect from the set above will determine a handler. As an example, let's take the case of a computation with one $\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}$, i.e., whose effect is just the singleton $(e \rightarrow t) \rightarrow t ⤚ e$.
+
+$$\begin{align*}
+&\mathtt{handleSentence}_{(e \rightarrow t) \rightarrow t ⤚ e} : \mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e}(t) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
+&\mathtt{handleSentence}_{(e \rightarrow t) \rightarrow t ⤚ e} m\\
+=\ \ &\mathtt{handle}\ \mathtt{getPutScopeHandler}\ m\\
+=\ \ &m (\lambda q, k.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ q\ (\lambda x.\mathtt{handle}\ \mathtt{getPutScopeHandler}\ (k x)))\\
+=\ \ &m (\lambda q, k.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ q\ (\lambda x.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ (k x)))\\
+=\ \ &m (\lambda q, k.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ q\ (\lambda x.\mathtt{interpretStVal}\ (k x)))\\
+=\ \ &m (\lambda q, k.\mathtt{interpretStScope}\ q\ (\lambda x.\mathtt{interpretStVal}\ (k x)))\\
+=\ \ &m (\lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.\mathtt{interpretStVal}\ (k x) (\lambda\star, k^\prime.k^\prime g (\lambda g^\prime, k^{\prime\prime}.k^{\prime\prime} \star))))))\\
+=\ \ &m (\lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.k x))))\\
+=\ \ &m (\lambda q, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.q (\lambda x.k x))))
+\end{align*}$$
+
+Note that, in this case, the type of $m$ is
+
+$$\begin{align*}
+&(((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow \mathcal{F}_\epsilon(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
+=\ \ &(((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow t) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)
+\end{align*}$$
+
+so that the result type $o$ is fixed to $\mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)$.
 
 * A linguistic example<<sec:a linguistic example>>
 

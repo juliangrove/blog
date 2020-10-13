@@ -106,7 +106,7 @@ What we end up with is a computation that returns a value of type $t$. In order 
 
 $$\begin{align*}
 \mathtt{handleScope} &: \mathcal{F}_{\{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\}}(t) \rightarrow t\\
-\mathtt{handleScope} m &= \Downarrow (\banana{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} : \lambda Q, k.\eta (Q (\Downarrow (\mathcal{C} k))), \eta : \lambda x.\eta x} m)
+\mathtt{handleScope} m &= \Downarrow (\banana{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} : \lambda q, k.\eta (q (\Downarrow (\mathcal{C} k))), \eta : \lambda x.\eta x} m)
 \end{align*}$$
 
 Indeed, it can be deduced from the typing rules for /handler/, /extraction/, and /exchange/ that $\mathtt{handleScope}$ has the type indicated. What we're currently lacking is the relevant operational semantics for these constructs; let's provide it now (repeating Maršík's definitions).
@@ -144,9 +144,9 @@ Given these additions, we may handle the sentence /every dog barked/ using $\mat
 $$\begin{align*}
 &\mathtt{handleScope} \IF{\textit{every dog barked}}\\
 =\ &\mathtt{handleScope} (\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x)))\\
-=\ &\Downarrow (\banana{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} : \lambda Q, k.\eta (Q (\Downarrow (\mathcal{C} k))), \eta : \lambda x.\eta x}\\
+=\ &\Downarrow (\banana{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} : \lambda q, k.\eta (q (\Downarrow (\mathcal{C} k))), \eta : \lambda x.\eta x}\\
 &\hspace{2cm}(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x))))\\
-=\ &\Downarrow ((\lambda Q, k^\prime.\eta (Q (\Downarrow (\mathcal{C} k^\prime)))) (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x)))\\
+=\ &\Downarrow ((\lambda q, k^\prime.\eta (q (\Downarrow (\mathcal{C} k^\prime)))) (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x)))\\
 =\ &\Downarrow ((\lambda k^\prime.\eta ((\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\Downarrow (\mathcal{C} k^\prime)))) (\lambda x.\eta (\textbf{bark} x)))\\
 =\ &\Downarrow (\eta ((\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\Downarrow (\mathcal{C} (\lambda x.\eta (\textbf{bark} x))))))\\
 =\ &\Downarrow (\eta ((\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\Downarrow (\eta (\lambda x.\textbf{bark} x)))))\\
@@ -166,6 +166,7 @@ We'll attempt here to render some of the ideas illustrated above in the more fam
 #+BEGIN_SRC haskell
 {-# LANGUAGE
     DataKinds,
+    FlexibleContexts,
     FlexibleInstances,
     GADTs,
     InstanceSigs,
@@ -377,9 +378,9 @@ m^\triangleright &= m \bind \lambda x.\mathtt{get}^\prime_{\star ⤚ \gamma} \st
 -- | Make a computation returning an 'Entity' live for anaphora.
 bind :: F l Entity -> F (l :++ [() >-- [Entity], [Entity] >-- ()]) Entity
 bind m = m >>= \x ->
-	   get' () >>= \g ->
-	   put' (x:g) >>
-	   return x
+	 get' () >>= \g ->
+	 put' (x:g) >>
+	 return x
 #+END_SRC
 
 Thus $(\cdot)^\triangleright$ reads in the entity returned by its input, gets the current environment, puts a new environment (consisting of the entity appended to the old environment), and, finally, returns the entity again. Note that the effect associated with the resulting computation is just whatever the effect $l$ associated with the input is, but concatenated on the left with the effect $\star ⤚ \gamma, \gamma ⤚ \star$.
@@ -454,7 +455,7 @@ $$\begin{align*}
 
 Such simpler computations are "fully interpreted", insofar as they correspond exactly to computations in the State monad. In particular, the above \lambda-term may be viewed as an alternative notation for the following Stateful program.
 
-$$\lambda g.(v, g^\prime)$$
+$$\lambda g.\langle v, g^\prime\rangle$$
 
 Accordingly, we will interpret values by simply returning them in (our encoding of) the State monad; that is, using the following interpreter.
 
@@ -469,13 +470,12 @@ type InterpretStVal v = InterpretVal '[() >-- [Entity], [Entity] >-- ()] v v
 
 -- | Interpret a value.
 interpretStVal :: InterpretStVal v
-interpretStVal
-  = \v -> Impure $ \h -> h () $ \g -> Impure $ \h' -> h' g $ \_ -> Pure v
+interpretStVal = \v -> get () (\g -> put g (\() -> return v))
 #+END_SRC
 
 That is, the interpreter for values yields a computation corresponding to the following program, given a value $v$.
 
-$$\lambda g.(v, g)$$
+$$\lambda g.\langle v, g\rangle$$
 
 Analogously, the interpreters for operations have the following types.
 
@@ -498,9 +498,8 @@ $$\begin{align*}
 #+BEGIN_SRC haskell
 -- | Interpret a 'get' occurrence.
 interpretStGet :: InterpretGet v
-interpretStGet
-  = \_ k -> Impure $ \h -> h () $ \g -> case k g of
-                                          Impure m -> m $ \_ k' -> k' g
+interpretStGet = \() k -> get () (\g -> case k g of
+                                          Impure m -> m $ \() k' -> k' g)
 #+END_SRC
 
 Thus we interpret a $\mathtt{get}_{\star ⤚ \gamma}$ by building a computation of type $\mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)$ that feeds its (interpreted) continuation of type $\gamma \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)$ the first gotten environment of the computation, after which it, again, feeds this environment to the outer $\mathtt{get}_{\star ⤚ \gamma}$  of the result.
@@ -516,9 +515,8 @@ $$\begin{align*}
 #+BEGIN_SRC haskell
 -- | Interpret a 'put' occurrence.
 interpretStPut :: InterpretPut v
-interpretStPut
-  = \g k -> Impure $ \h -> h () $ \_ -> case k () of
-                                          Impure m -> m $ \_ k' -> k' g
+interpretStPut = \g k -> get () (\g' -> case k () of
+                                          Impure m -> m $ \() k' -> k' g)
 #+END_SRC
 
 In this case, the $\mathtt{put}_{\gamma ⤚ \star}$ occurrence is interpreted by plugging its (interpreted) continuation with $\star$ and then feeding the environment it puts to the outer $\mathtt{get}_{\star ⤚ \gamma}$ of the result. Doing so ensures that $\mathtt{put}_{\gamma ⤚ \star}$ has the required effect on the resulting computation; i.e., that of dictating its input.
@@ -534,16 +532,15 @@ $$\begin{align*}
 #+BEGIN_SRC haskell
 -- | Interpret a 'scope' occurrence.
 interpretStScope :: InterpretScope
-interpretStScope
-  = \q k ->
-  Impure $ \h -> h () $ \g ->
-  Impure $ \h' -> h' g $ \_ ->
-  Pure $ q $ \x -> case k x of
-                     Impure m -> m $ \_ k' ->
-                       case k' g of
-                         Impure m' -> m' $ \_ k'' ->
-                           case k'' () of
-                             Pure a -> a
+interpretStScope = \q k ->
+                 get () (\g ->
+                 put g (\() ->
+                 return (q $ \x -> case k x of
+                                     Impure m -> m $ \_ k' ->
+                                       case k' g of
+                                         Impure m' -> m' $ \_ k'' ->
+                                           case k'' () of
+                                             Pure a -> a)))
 #+END_SRC
 
 Thus, in order to interpret an occurrence of $\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}$, we must essentially push the $(e \rightarrow t) \rightarrow t$ -type quantifier meaning down past the $\mathtt{get}_{\star ⤚ \gamma}$ and $\mathtt{put}_{\gamma ⤚ \star}$ of the resulting computation so that it may gain access to a continuation of type $e \rightarrow t$. The implication of using such an interpreter for $\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}$ effects is that quantifier meanings may only be handled inside computations whose value type is $t$, i.e., at sentence boundaries. An immediate consequence of pushing quantifier meanings down past $\mathtt{get}_{\star ⤚ \gamma}$ and $\mathtt{put}_{\gamma ⤚ \star}$ (a maneuver which has been forced upon us by the types!) is that dynamic effects incurred within the quantifier's scope are lost outside of it. In other words, allowing quantifier meanings access to a scope of the right type forces a situation in which they may be live candidates for anaphora inside of their scope, but not outside of it. We have thus derived (from their types!) that quantifier meanings are internally dynamic, but externally static, with respect to anaphora. This situation does not hold for ordinary anaphora, i.e., to individual-denoting expressions, whose side effects are captured in the resulting State-monadic algebra, rendering them dynamic.[fn:: Such considerations suggest that indefinites, which give rise to exceptional scope, /should not/ be analyzed as generalized quantifiers within our fragment, but, rather, as something else. It might be beneficial to try to add a version of non-determinism to the signature, in the vein of cite:charlow_semantics_2014.]
@@ -719,32 +716,108 @@ so that the result type $o$ is fixed to $\mathcal{F}_{\star ⤚ \gamma, \gamma �
 
 * A linguistic example<<sec:a linguistic example>>
 
-$\begin{align*}
-\IF{\textit{every linguist}} &: \mathcal{F}_{((e \rightarrow t) \rightarrow t)⤚ e}(e)\\
-\IF{\textit{every linguist}} &= \mathtt{scope}^\prime_{((e \rightarrow t) \rightarrow t) ⤚ e} (\lambda k.\forall x : \textbf{ling} x\ \rightarrow\ k x)\\
-&= \lambda h.h\ (\lambda k.\forall x : \textbf{ling} x\ \rightarrow\ k x)\ (\lambda y.y)\\[2mm]
-\IF{\textit{her dog}} &: \mathcal{F}_{\star ⤚ \gamma}(e)\\
-\IF{\textit{her dog}} &= \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\textbf{dogOf} (\mathtt{sel} g))\\
-&= \lambda h.h \star (\lambda g.\textbf{dogOf} (\mathtt{sel} g))\\[2mm]
-(\cdot)^\triangleright &: \mathcal{F}_l e \rightarrow \mathcal{F}_{l, \star ⤚ \gamma, \gamma ⤚ \star}(e)\\
-m^\triangleright &= m \bind \lambda x.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{x}{g}; \lambda\star.x))\\
-&= m \bind \lambda x, h.h \star (\lambda g, h^\prime.h^\prime (\append{x}{g}) (\lambda\star.x)) 
-\end{align*}$
+In this section, I'll present a small linguistic example to illustrate the algebraic effects approach and, crucially, the dynamic property of quantifiers mentioned. We'll consider, in particular, the following two sentences, which differ in their in their dynamic behavior.
 
-$\begin{align*}
-(\triangleright) &: \mathcal{F}_{l_1}(v \rightarrow w) \rightarrow \mathcal{F}_{l_2}(v) \rightarrow \mathcal{F}_{l_1, l_2}(w)\\
-m \triangleright n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda f.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda x.f x)\ n)\ m)\\[2mm]
-(\triangleleft) &: \mathcal{F}_{l_1}(v) \rightarrow \mathcal{F}_{l_2}(v \rightarrow w) \rightarrow \mathcal{F}_{l_1, l_2}(w)\\
-m \triangleleft n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda x.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda f.f x)\ n)\ m)
-\end{align*}$
+1. Every postdoc cited herself.<<ex1>>
+2. Ashley cited herself.<<ex2>>
+
+** Lexicon
+
+Let's first introduce a lexicon of English, complete with denotations as simply typed \lambda-terms. To analyze anaphora, we'll use the $\mathtt{sel}$ function of cite:degroote_towards_2006, which retrieves an individual from the environment (and is thus of type $\gamma \rightarrow e$).
+  
+$$\begin{align*}
+\mathtt{every} &: (e \rightarrow t) \rightarrow \mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e}(e)\\
+\mathtt{every} &= \lambda p.\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : p x\ \rightarrow\ k x)\\
+&= \lambda p, h.h\ (\lambda k.\forall x : p x\ \rightarrow\ k x)\ (\lambda y.y)\\[3mm]
+\mathtt{herself} &: \mathcal{F}_{\star ⤚ \gamma}(e)\\
+\mathtt{herself} &= \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{sel} g)\\
+&= \lambda h.h \star (\lambda g.\mathtt{sel} g)\\[3mm]
+(\cdot)^\triangleright &: \mathcal{F}_l e \rightarrow \mathcal{F}_{l, \star ⤚ \gamma, \gamma ⤚ \star}(e)\tag{bind}\\
+m^\triangleright &= m \bind \lambda x.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{x}{g}; \lambda\star.x))\\
+&= m \bind \lambda x, h.h \star (\lambda g, h^\prime.h^\prime (\append{x}{g}) (\lambda\star.x))\\[3mm]
+\mathtt{postdoc} &: e \rightarrow t\\
+\mathtt{postdoc} &= \textbf{pd}\\[3mm]
+\mathtt{cited} &: \mathcal{F}_\epsilon(e \rightarrow e \rightarrow t)\\
+\mathtt{cited} &= \textbf{cite}^\eta\\[3mm]
+\mathtt{ashley} &: \mathcal{F}_\epsilon(e)\\
+\mathtt{ashley} &= \textbf{a}^\eta
+\end{align*}$$
+
+** Grammar
+
+Additionally, we'll need versions of forward and backward Functional Application, which we present in terms of $\mathtt{map}_{\mathcal{F}_l}$ and an operator $\mu$ (called 'join'). This presentation is necessary for Haskell to infer the correct type for the application combinators and is equivalent to the presentation in terms of $\bind$ and $(\cdot)^\eta$.
+
+$$\begin{align*}
+\mu &: \mathcal{F}_{l_1}(\mathcal{F}_{l_2}(v)) \rightarrow \mathcal{F}_{l_1,l_2}(v)\tag{join}\\
+\mu m &= m \bind \lambda n.n
+\end{align*}$$
 
 #+BEGIN_SRC haskell
+-- | Graded monadic 'join'.
+join :: F l1 (F l2 v) -> F (l1 :++ l2) v
+join m = m >>= id
+#+END_SRC
+
+$$\begin{align*}
+(\triangleright) &: \mathcal{F}_{l_1}(v \rightarrow w) \rightarrow \mathcal{F}_{l_2}(v) \rightarrow \mathcal{F}_{l_1, l_2}(w)\tag{forward application}\\
+m \triangleright n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda f.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda x.f x)\ n)\ m)\\[3mm]
+(\triangleleft) &: \mathcal{F}_{l_1}(v) \rightarrow \mathcal{F}_{l_2}(v \rightarrow w) \rightarrow \mathcal{F}_{l_1, l_2}(w)\tag{backward application}\\
+m \triangleleft n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda x.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda f.f x)\ n)\ m)
+\end{align*}$$
+
+#+BEGIN_SRC haskell
+-- | Forward application
 (|>) :: F l1 (v -> w) -> F l2 v -> F (l1 :++ l2) w
 m |> n = join $ fmap (\f -> fmap (\x -> f x) n) m
 
+-- | Backward application
 (<|) :: F l1 v -> F l2 (v -> w) -> F (l1 :++ l2) w
 m <| n = join $ fmap (\x -> fmap (\f -> f x) n) m
 #+END_SRC
+
+** Examples
+
+Let's first look at example [[ex1]].
+
+$$\begin{align*}
+&(\mathtt{every} \mathtt{postdoc})^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself})\\
+=\ \ &(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : \textbf{pd} x\ \rightarrow\ k x))^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself})\\
+=\ \ &(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : \textbf{pd} x\ \rightarrow k x))^\triangleright \triangleleft \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\textbf{cite} (\mathtt{sel} g))\\
+=\ \ &\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : \textbf{pd} x\ \rightarrow k x)\\
+&\hspace{1cm}(\lambda y.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{y}{g}; \lambda\star.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g^\prime.\textbf{cite} (\mathtt{sel} g^\prime) y))))
+\end{align*}$$
+
+As we can see by inspecting the operations present in the resulting \lambda-term, the semantic type of [[ex1]] is $\mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e, \star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ \ (t)$. Its side effects are, in order, to invoke a quantifier meaning, read the environment, update the environment with the variable bound by the quantifier, and, finally, to read the environment again to do anaphora.
+
+Example [[ex2]] composes in a similar way.
+
+$$\begin{align*}
+&\mathtt{ashley}^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself})\\
+=\ \ &\mathtt{ashley}^\triangleright \triangleleft \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\textbf{cite} (\mathtt{sel} g))\\
+=\ \ &\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{\textbf{a}}{g}; \lambda\star.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g^\prime.\textbf{cite} (\mathtt{sel} g^\prime) \textbf{a})))
+\end{align*}$$
+
+In this case, the resulting type is simpler --- $\mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ (t)$ --- as there is no quantifier. The environment is read, updated with $\textbf{a}$, and then read again for anaphora.
+
+Of course these "meanings" are not enough; we need to handle them! Doing so will produce ordinary State-monadic meanings, which we may associate with truth conditions. Fortunately, both sentences are of the right value type ($t$) to be handled. In the case of example [[ex1]], we wish to derive the following.
+
+$$\mathtt{handleSentence}_{(e \rightarrow t) \rightarrow t ⤚ e, \star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ \ ((\mathtt{every} \mathtt{postdoc})^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself}))$$
+
+There is not enough space here to show how the handler is computed, as well as provide the relevant \beta-reductions, so I'll leave that as an (extremely tedious) exercise for the reader. The simplified meaning which results, however, is the following one.
+
+$$\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.\forall x.\textbf{pd} x \rightarrow \textbf{cite} (\mathtt{sel} (\append{x}{g})) x))$$
+
+This meaning is equivalent to the State monadic program $\lambda g.\langle\forall x.\textbf{pd} x \rightarrow \textbf{cite} (\mathtt{sel} (\append{x}{g})) x, g\rangle$; as required, it is externally static.
+
+Likewise, we wish to derive the following interpreted meaning for example [[ex2]].
+
+$$\mathtt{handleSentence}_{\star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ \ (\mathtt{ashley}^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself}))$$
+
+In this case, the simplified meaning which results is the following.
+
+$$\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{\textbf{a}}{g}; \lambda\star.\textbf{cite} (\mathtt{sel} (\append{\textbf{a}}{g})) \textbf{a}))$$
+
+This meaning is equivalent to the State-monadic program $\lambda g.\langle\textbf{cite} (\mathtt{sel} (\append{\textbf{a}}{g})) \textbf{a}, \append{\textbf{a}}{g}\rangle$; it is thus externally dynamic, in contrast to the meaning of example [[ex1]].
 
 * Summary
 

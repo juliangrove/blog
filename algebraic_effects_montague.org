@@ -721,22 +721,22 @@ so that the result type $o$ is fixed to $\mathcal{F}_{\star ⤚ \gamma, \gamma �
 * A linguistic example<<sec:a linguistic example>>
 
 $\begin{align*}
-\IF{\textit{some linguist}} &: \mathcal{F}_{((e \rightarrow t) \rightarrow t)⤚ e} e\\
-\IF{\textit{some linguist}} &= \mathtt{scope}_{((e \rightarrow t) \rightarrow t) ⤚ e}(\lambda P.\exists x : \textbf{ling} x\ \&\ P x; \eta)\\
-&= \lambda h.h\ (\lambda P.\exists x : \textbf{ling} x\ \&\ P x)\ (\lambda y.y)\\[2mm]
-\IF{\textit{her dog}} &: \mathcal{F}_{() ⤚ \gamma} e\\
-\IF{\textit{her dog}} &= \mathtt{get}_{() ⤚ \gamma}((); \lambda g.\eta (\textbf{dogOf} (\mathtt{sel} g)))\\
-&= \lambda h.h\ ()\ (\lambda g, k.k (\textbf{dogOf} (\mathtt{sel} g)))\\[2mm]
-(\cdot)^\triangleright &: \mathcal{F}_l e \rightarrow \mathcal{F}_{l, () ⤚ \gamma, \gamma ⤚ ()} e\\
-m^\triangleright &\defeq m \bind (\lambda x.\mathtt{get}_{() ⤚ \gamma}((); \lambda g.\mathtt{put}_{\gamma ⤚ ()}(\append{x}{g}; \lambda ().\eta x)))\\
-&= m \bind \lambda x, h.h\ ()\ (\lambda g, h^\prime.h^\prime\ (\append{x}{g})\ (\lambda ().x)) 
+\IF{\textit{every linguist}} &: \mathcal{F}_{((e \rightarrow t) \rightarrow t)⤚ e}(e)\\
+\IF{\textit{every linguist}} &= \mathtt{scope}^\prime_{((e \rightarrow t) \rightarrow t) ⤚ e} (\lambda k.\forall x : \textbf{ling} x\ \rightarrow\ k x)\\
+&= \lambda h.h\ (\lambda k.\forall x : \textbf{ling} x\ \rightarrow\ k x)\ (\lambda y.y)\\[2mm]
+\IF{\textit{her dog}} &: \mathcal{F}_{\star ⤚ \gamma}(e)\\
+\IF{\textit{her dog}} &= \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\textbf{dogOf} (\mathtt{sel} g))\\
+&= \lambda h.h \star (\lambda g.\textbf{dogOf} (\mathtt{sel} g))\\[2mm]
+(\cdot)^\triangleright &: \mathcal{F}_l e \rightarrow \mathcal{F}_{l, \star ⤚ \gamma, \gamma ⤚ \star}(e)\\
+m^\triangleright &= m \bind \lambda x.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{x}{g}; \lambda\star.x))\\
+&= m \bind \lambda x, h.h \star (\lambda g, h^\prime.h^\prime (\append{x}{g}) (\lambda\star.x)) 
 \end{align*}$
 
 $\begin{align*}
-(\triangleright) &: \mathcal{F}_{l_1} (v \rightarrow w) \rightarrow \mathcal{F}_{l_2} v \rightarrow \mathcal{F}_{l_1, l_2} w\\
-m \triangleright n &\defeq \mu\ (\mathtt{map}\ (\lambda f.\mathtt{map}\ (\lambda x.f x)\ n)\ m)\\[2mm]
-(\triangleleft) &: \mathcal{F}_{l_1} v \rightarrow \mathcal{F}_{l_2} (v \rightarrow w) \rightarrow \mathcal{F}_{l_1, l_2} w\\
-m \triangleleft n &\defeq \mu\ (\mathtt{map}\ (\lambda x.\mathtt{map}\ (\lambda f.f x)\ n)\ m)
+(\triangleright) &: \mathcal{F}_{l_1}(v \rightarrow w) \rightarrow \mathcal{F}_{l_2}(v) \rightarrow \mathcal{F}_{l_1, l_2}(w)\\
+m \triangleright n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda f.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda x.f x)\ n)\ m)\\[2mm]
+(\triangleleft) &: \mathcal{F}_{l_1}(v) \rightarrow \mathcal{F}_{l_2}(v \rightarrow w) \rightarrow \mathcal{F}_{l_1, l_2}(w)\\
+m \triangleleft n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda x.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda f.f x)\ n)\ m)
 \end{align*}$
 
 #+BEGIN_SRC haskell

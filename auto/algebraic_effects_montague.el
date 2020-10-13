@@ -14,7 +14,6 @@
     "bauer_what_2019"
     "kiselyov_freer_2015"
     "brady_programming_2013"
-    "atkey_parameterised_2009"
     "shan_monads_2002"
     "orchard_embedding_2014"
     "degroote_towards_2006"))

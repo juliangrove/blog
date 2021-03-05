@@ -1,0 +1,1766 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-10-13 Tue 19:47 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Algebraic effects in Montague semantics</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Julian Grove" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="readtheorg.css"/>
+<script src="jquery.min.js"></script>
+<script src="bootstrap.min.js"></script>
+<script type="text/javascript" src="readtheorg.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+TeX: {
+Macros: {
+divd: "\\ |\\ ",
+IF: ["[\\![#1]\\!]",1],
+banana: ["(\\!|#1|\\!)",1],
+bind: ">\\!\\!>\\!\\!=",
+defeq: ":\\!=",
+append: ["#1\\!\\!::\\!\\!#2",2]
+}
+}
+});
+</script>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Algebraic effects in Montague semantics</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org26ec1be">1. Algebraic effects</a></li>
+<li><a href="#orgfc4efe9">2. Making it Montagovian</a>
+<ul>
+<li><a href="#org0ba105d">2.1. Computation types</a></li>
+<li><a href="#orga18003b">2.2. Graded monads</a></li>
+<li><a href="#orgb590131">2.3. Operations</a>
+<ul>
+<li><a href="#orgdcef9fc">2.3.1. State</a></li>
+<li><a href="#orgb1dc8c3">2.3.2. Quantification</a></li>
+</ul>
+</li>
+<li><a href="#orgbfdacd2">2.4. Handlers</a></li>
+</ul>
+</li>
+<li><a href="#org4bb434c">3. A linguistic example</a>
+<ul>
+<li><a href="#org11f0d99">3.1. Lexicon</a></li>
+<li><a href="#org09e8b8b">3.2. Grammar</a></li>
+<li><a href="#org7e4c0a4">3.3. Examples</a></li>
+</ul>
+</li>
+<li><a href="#org74b9a22">4. Summary</a></li>
+</ul>
+</div>
+</div>
+<p>
+Algebraic effects and handlers provide an approach to implementing computational side effects which has gained interest within the functional programming community, notably among users of Haskell.<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> Often, programmers wish to combine different notions of side effect within the same code; for example, one may wish to write a program that both reads the environment at various points, as well as logs output. In Haskell, one may use the Reader and Writer monads to accomplish these tasks, respectively. Combining notions of side effect is, in turn, usually a matter of invoking monad transformers, which furnish some underlying monad with the functionality of a new monad, yielding aspects of both (e.g., a Reader-transformed Writer monad). The use of transformers, however, generally implies that code is not totally extensible &#x2014; extra plumbing is required, for instance, for Reader code to exist peacefully in a Reader-Writer setting.<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> Moreover, after extending previous monadic code into a setting in which new layers have been added to the transformer stack, its interpretation becomes fixed: if the old code involes Reader \(s_1\), and the new code involves both Reader \(s_1\) and Reader \(s_2\), then the Reader \(s_2\) layer is necessarily evaluated first.  The interest in the algebraic effects approach comes, in part, from the fact that it is designed around extensibility: multiple notions of side effect are combined algebraically and tracked within the types. The combination is relatively seamless, moreover, in the sense that no extra plumbing is required for multiple notions of effect; and it is flexible, insofar as decisions about interpretation may be delayed until a later stage &#x2014; in the definitions of handlers.
+</p>
+
+<p>
+In this post, I'll experiment a little bit with the algebraic approach in the context of modeling linguistic side effects, in particular, anaphora and quantification. Jirka Maršík has done significant work studying semantic phenomena from the perspective of algebraic effects and handlers, culminating in his <a href="https://hal.inria.fr/tel-01417467">2016 PhD thesis</a> (see [<a href="#marsik_algebraic_2014">Maršík and Amblard, 2014</a>,<a href="#marsik_introducing_2016">Maršík and Amblard, 2016</a>,<a href="#marsik_effects_2016">Maršík, 2016</a>]). This work, whose main features I'll briefly summarize in &sect;<a href="#orgef3a691">1</a>, is cast within a typed extension of the &lambda;-calculus designed for algebraic effects. Maršík's work departs somewhat from the denotational view of meaning semanticists in the Montagovian tradition are typically accustomed to, at least on its face. He provides an operational semantics for the extended language, which includes operations and handlers, among other constructs. The semantics allows the representations provided in the extended language to be transformed into more familiar ones denoting ordinary truth-conditions (represented by simply typed &lambda;-terms). The process of mapping expressions of the extended language into the STLC, however, involves sacrificing the usual Montagovian view of the meanings of their component parts.<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup> 
+</p>
+
+<p>
+I will mainly use this post is to explore how similar ideas may be expressed in a more traditional Montagovian setting. &sect;<a href="#org3e84c51">2</a> begins an attempt in this direction with a framework having the functionality of the algebraic effects approach, cast within the simply typed &lambda;-calculus (including products). The basic strategy explored is one which views algebraic operations as variables bound (and thus given meaning) by their handlers. This view of operations allows them to be recast as &lambda;-abstractions, giving rise to an interpretation scheme on which operations denote functions on their handlers. Along the way, I'll present algebraic effects for anaphora in terms of operations for State (\(\mathtt{get}\) and \(\mathtt{put}\)), as well as algebraic effects for quantification. Designing a handler for the combined grammar will have an interesting consequence for their interaction &#x2014; in particular, having to do with the dynamic properties of quantifiers. The proposals have been implemented in Haskell, and relevant parts of the text are accompanied by their corresponding Haskell code. The full code is available <a href="https://github.com/juliangrove/algebraic-effects-montague">here</a>.
+</p>
+
+<div id="outline-container-org26ec1be" class="outline-2">
+<h2 id="org26ec1be"><span class="section-number-2">1</span> Algebraic effects<a id="orgef3a691"></a></h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The basic features of Maršík's approach are presented in the papers [<a href="#marsik_algebraic_2014">Maršík and Amblard, 2014</a>,<a href="#marsik_introducing_2016">Maršík and Amblard, 2016</a>], as well as in the first chapter of <a href="https://hal.inria.fr/tel-01417467">his thesis</a>. In addition to the expressions of the simply typed &lambda;-calculus, Maršík includes the constructs <i>injection</i>, <i>operation</i>, <i>handler</i>, <i>extraction</i>, and <i>exchange</i>. Unlike the simply typed fragment of his language, these constructs have types involving (for value types \(\alpha\)) the computation types \(\mathcal{F}(\alpha)\), providing the types of expressions with algebraic effects. The type of any computation with algebraic effects is indexed by an <i>effect signature</i>; that is, a set of operation symbols, along with an assignment of types to these operation symbols that indicate any parameters the associated operation takes, as well as the operation's arity. The signature that indexes the type of a computation describes the collection of operations that <i>may</i> be invoked in the computation. For example, the computation type \(\mathcal{F}_{\{\mathtt{op} : p ⤚ a\}}(\alpha)\) is the type of computations which may invoke the operation \(\mathtt{op}\) (which takes parameters of type \(p\) and which has arity \(a\)), in order to return values of type \(\alpha\).  
+</p>
+
+<p>
+Where \(E\) is an arbitrary effect signature and \(\varnothing\) is the empty effect signature, the constructs of <i>injection</i>, <i>operation</i>, <i>handler</i>, <i>extraction</i>, and <i>exchange</i> have the following typing rules. (I've modified some symbols from Maršík's original presentation so that they more easily render with <a href="https://www.mathjax.org/">MathJax</a>.)
+</p>
+
+<p>
+\[\cfrac{\Gamma \vdash M : \alpha}{\Gamma \vdash \eta M : \mathcal{F}_E(\alpha)}\eta\tag{injection}\\[3mm]\]
+\[\cfrac{\Gamma \vdash M : p\hspace{5mm}\Gamma, x : a \vdash N : \mathcal{F}_E(\gamma)\hspace{5mm}\mathtt{op}_{p ⤚ a} \in E}{\Gamma \vdash \mathtt{op} M (\lambda x. N) : \mathcal{F}_E(\gamma)}\mathtt{op}\tag{operation}\\[3mm]\]
+\[\cfrac{E = \{\mathtt{op}_i : p_i ⤚ a_i\}_{i \in I} \uplus E_f\\E^\prime = E^{\prime\prime} \uplus E_f\\{[}\Gamma \vdash M_i : p_i \rightarrow (a_i \rightarrow \mathcal{F}_{E^\prime}(\delta)) \rightarrow \mathcal{F}_{E^\prime}(\delta){]}_{i \in I}\\\Gamma \vdash N : \gamma \rightarrow \mathcal{F}_{E^\prime}(\delta)\\\Gamma \vdash O : \mathcal{F}_E(\gamma)}{\Gamma \vdash \banana{(\mathtt{op}_i : M_i)_{i \in I}, \eta : N} O : \mathcal{F}_{E^\prime}(\delta)}\banana{}\tag{handler}\\[3mm]\]
+\[\cfrac{\Gamma \vdash M : \mathcal{F}_\varnothing(\alpha)}{\Gamma \vdash ⇓ M : \alpha}⇓\tag{extraction}\\[3mm]\]
+\[\cfrac{\Gamma \vdash M : \alpha \rightarrow \mathcal{F}_E(\beta)}{\Gamma \vdash \mathcal{C} M : \mathcal{F}_E(\alpha \rightarrow \beta)}\mathcal{C}\tag{exchange}\]
+</p>
+
+<p>
+The type of an injection is such that it may be associated with any signature \(E\); in other words, values of type \(\alpha\) may be injected into any algebra, no matter what signature it has, as a trivial computation which simply returns that value.
+</p>
+
+<p>
+Explaining the typing rule for operations requires elaborating a few background conventions. The premise \(\mathtt{op}_{p ⤚ a} \in E\) indicates that operation \(\mathtt{op}\) takes a parameter of type \(p\) and has arity \(a\); that is, it first applies to a term of type \(p\) and then takes \(a\) -many elements of the algebra, i.e., \(a\) -many arguments of type \(\mathcal{F}_E(\gamma)\), for some value type \(\gamma\). As \(a\) is a type (rather than a cardinality), we simply follow the convention that having arity \(a\) is equivalent to being able to apply to an \(a\) -indexed family of elements of the algebra, or, in other words, to a function of type \(a \rightarrow \mathcal{F}_E(\gamma)\). Thus a binary operation, for example, may be thought of as one which applies to a \(\mathtt{Bool}\) -indexed family of elements, where \(\mathtt{Bool}\) is the type with two inhabitants: \(\mathtt{True}\) and \(\mathtt{False}\). And a unary operation may be thought of as one which applies to a \(\star\) -indexed family of elements, where \(\star\) is the unit type, having one element (also called \(\star\)). (See [<a href="#bauer_what_2019">Bauer, 2019</a>] for a really great, accessible introduction to the relationship between algebra, as traditionally conceived, and as a framework for theories of computation.) In these terms, the typing rule for operations may be read as saying that if \(\mathtt{op}\) takes a parameter of type \(p\), along with \(a\) -many arguments of an algebra with signature \(E\) containing the operation, and there is a term \(M\) of type \(p\), as well as a way of determining an element \(N\) of the algebra \(\mathcal{F}_E(\gamma)\) for each index \(x : a\), then one may apply the operation to the parameter \(M\) and the \(a\) -indexed family of elements \(\lambda x.N\) to get a new element of the algebra.
+</p>
+
+<p>
+The typing rule for handlers appears the most complex. In it, \(\uplus\) denotes disjoint union (of effect signatures), and \(I\) is some set indexing a set of judgments of the form presented in the third premise. In all, the typing rule says (approximately) that if there are terms \(M_i\) taking parameters of type \(p_i\) and \(a_i\) -many arguments from an algebra with some effect signature \(E^\prime\) (where \(E^\prime\) is required to contain any operations that will <i>not</i> be handled by the \(M_i\)), along with a term \(N\) mapping values of type \(\gamma\) into this algebra, then the handler that interprets operations \(\mathtt{op}_i\) with \(M_i\) and \(\eta x\) with \(N x\) can be applied to a computation \(O\) from an algebra which has the operations \(\mathtt{op}_i\) in its signature, in order to get an element of the new algebra with signature \(E^\prime\). In summary, handlers can apply to elements of one algebra to obtain elements of another algebra by providing terms to interpret the operations of the first as functions in the second.
+</p>
+
+<p>
+The typing rules for extraction and exchange are straightforward. Extraction applies to a computation whose effect signature is empty, and thus which is guaranteed to only return a value; its role, as reflected in its type, is to extract that value from the computation. Exchange applies to a function from a value to a computation, in order to deliver a computation of a function between values. Maršík uses this construct to assist with the semantics of quantifiers.
+</p>
+
+<p>
+Let's illustrate the approach with an example involving quantifiers. Note that I won't present Maršík's analysis of quantification, even though I'll make use of the formal language he provides. The example is meant only to be expository. We start by introducing an operator \(\mathtt{scope}\) with the type \((e \rightarrow t) \rightarrow t ⤚ e\); i.e., which takes a parameter of type \((e \rightarrow t) \rightarrow t\) (a standard generalized quantifier meaning) and has arity \(e\) (meaning it takes a continuation of type \(e \rightarrow \mathcal{F}_E(\gamma)\), where \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} \in E\)).<sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup> Using this operator, we can analyze <i>every</i> as denoting a function from predicates to computations which return values of type \(e\).
+</p>
+
+<p>
+\[\begin{align*}
+\IF{\textit{every}} &: (e \rightarrow t) \rightarrow \mathcal{F}_E(e)\ \ (\text{where}\ \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} \in E)\\
+\IF{\textit{every}} &= \lambda P.\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.P x \rightarrow k x) (\lambda x.\eta x)
+\end{align*}\]
+</p>
+
+<p>
+As a result, noun phrases like <i>every dog</i> denote computations, derived by Functional Application, which return values of type \(e\). In other words, they denote elements of an algebra whose signature contains the operator \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) and which is generated by the type \(e\).
+</p>
+
+<p>
+\[\begin{align*}
+\IF{\textit{every dog}} &: \mathcal{F}_E(e)\ \ (\text{where}\ \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} \in E)\\
+\IF{\textit{every dog}} &= \IF{\textit{every}} \IF{\textit{dog}}\\
+&= \IF{\textit{every}} \textbf{dog}\\
+&= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta x)
+\end{align*}\]
+</p>
+
+<p>
+Given this noun phrase, we would like a way of composing it with a verb &#x2014; say, <i>barked</i> &#x2014; in order to arrive at a sentence meaning. In fact, computations with algebraic effects can be composed using <i>monads</i>. Each algebraic effect signature gives rise to monad in the following way. First, the <i>return</i> (i.e., \((\cdot)^\eta\)) of the monad corresponds to the <i>injection</i> in the relevant algebra.
+</p>
+
+<p>
+\[\begin{align*}
+(\cdot)^\eta &: v \rightarrow \mathcal{F}_E(v)\\
+v^\eta &= \eta v
+\end{align*}\]
+</p>
+
+<p>
+Note that the \((\cdot)^\eta\) on the left-hand-side of the above definition is the return of the monad, and that the \(\eta\) on the right-hand-side is the injection of the algebra. The <i>bind</i> (i.e., \(\bind\)) of the monad may be defined by induction on the algebraic operations, i.e., in terms of an <i>injection</i> case and an <i>operation</i> case.
+</p>
+
+<p>
+\[\begin{align*}
+(\bind) &: \mathcal{F}_E(v) \rightarrow (v \rightarrow \mathcal{F}_E(w)) \rightarrow \mathcal{F}_E(w)\\
+\eta v \bind k &= k v\tag{injection}\\
+\mathtt{op} M N \bind k &= \mathtt{op} M (\lambda x.N x \bind k)\tag{operation}
+\end{align*}\]
+</p>
+
+<p>
+Using monadic \((\cdot)^\eta\) and \(\bind\), we may compose <i>every dog</i> and <i>barked</i> (the latter of which we may take to denote \(\textbf{bark} : e \rightarrow t\)) in the familiar way; that is, by lifting the meaning of the verb and composing it with the noun phrase in terms of forward and backward monadic Functional Application (\(\triangleright\) and \(\triangleleft\)).<sup><a id="fnr.5" class="footref" href="#fn.5">5</a></sup>
+</p>
+
+<p>
+\[\begin{align*}
+(\triangleright) &: \mathcal{F}_E(v \rightarrow w) \rightarrow \mathcal{F}_E(v) \rightarrow \mathcal{F}_E(w)\\
+m \triangleright n &= m \bind \lambda f.n \bind \lambda x.(f x)^\eta\\[3mm]
+(\triangleleft) &: \mathcal{F}_E(v) \rightarrow \mathcal{F}_E(v \rightarrow w) \rightarrow \mathcal{F}_E(w)\\
+m \triangleleft n &= m \bind \lambda x.n \bind \lambda f.(f x)^\eta
+\end{align*}\]
+</p>
+
+<p>
+We may now derive the meaning of <i>every dog barked</i> as follows.
+</p>
+
+<p>
+\[\begin{align*}
+\IF{\textit{every dog barked}} &: \mathcal{F}_E(t)\ \ (\textit{where}\ \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} \in E)\\
+\IF{\textit{every dog barked}} &= \IF{\textit{every dog}} \triangleleft \IF{\textit{barked}}\\
+&= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta x) \bind \lambda y.\textbf{bark}^\eta \bind \lambda f.(f y)^\eta\\
+&= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta x \bind \lambda y.\textbf{bark}^\eta \bind \lambda f.(f y)^\eta)\\
+&= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\textbf{bark}^\eta \bind \lambda f.(f x)^\eta)\\
+&= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta \textbf{bark}\bind \lambda f.(f x)^\eta)\\
+&= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.(\textbf{bark} x)^\eta)\\
+&= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x))\\
+\end{align*}\]
+</p>
+
+<p>
+What we end up with is a computation that returns a value of type \(t\). In order to interpret this computation in the simply typed &lambda;-calculus, Maršík's system allows us to define a handler, which we may, in turn, invoke as a kind of type shift that applies at the sentence level. Let's call this type shift \(\mathtt{handleScope}\) for short.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{handleScope} &: \mathcal{F}_{\{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\}}(t) \rightarrow t\\
+\mathtt{handleScope} m &= \Downarrow (\banana{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} : \lambda q, k.\eta (q (\Downarrow (\mathcal{C} k))), \eta : \lambda x.\eta x} m)
+\end{align*}\]
+</p>
+
+<p>
+Indeed, it can be deduced from the typing rules for <i>handler</i>, <i>extraction</i>, and <i>exchange</i> that \(\mathtt{handleScope}\) has the type indicated. What we're currently lacking is the relevant operational semantics for these constructs; let's provide it now (repeating Maršík's definitions).
+</p>
+
+<p>
+\[\begin{align*}
+\banana{(\mathtt{op}_i : M_i)_{i \in I}, \eta : N} (\eta O) &\Rightarrow N O\tag{handler}\\[3mm]
+\banana{(\mathtt{op}_i : M_i)_{i \in I}, \eta : N} (\mathtt{op}_j p k) &\Rightarrow M_j p (\lambda x.\banana{(\mathtt{op}_i : M_i)_{i \in I}, \eta : N} (k x))\tag{handler}\\
+&(\text{where}\ j \in I\ \text{and}\ x \notin fv((M_i)_{i \in I}, N))\\[3mm]
+\banana{(\mathtt{op}_i : M_i)_{i \in I}, \eta : N} (\mathtt{op}_j p k) &\Rightarrow \mathtt{op}_j p (\lambda x.\banana{(\mathtt{op}_i : M_i)_{i \in I}, \eta : N} (k x))\tag{handler}\\
+&(\text{where}\ j \notin I\ \text{and}\ x \notin fv((M_i)_{i \in I}, N))
+\end{align*}\]
+</p>
+
+<p>
+The semantics for handlers describes their behavior in three situations. The first situation is that in which the handler applies to a returned value, in which case, its \(\eta\) clause applies. In particular, if the handler handles returned values with the term \(N\) (as indicated inside the banana brackets), then handling a returned value with the handler is just a matter of applying \(N\) to it. The second situation is that in which the handler applies to an operation that it handles. In this case, the operation is interpreted as the handler dicates, and the handler continues to apply to the operation's arguments. The third situation is that in which the handler applies to an operation that it doesn't handle, in which case, the operation is ignored, and the handler continues to apply to the operation's arguments.
+</p>
+
+<p>
+Let's now consider the semantics of <i>extraction</i>.
+</p>
+
+<p>
+\[\begin{align*}
+\Downarrow (\eta v) &\Rightarrow v\tag{extraction}
+\end{align*}\]
+</p>
+
+<p>
+Thus extraction simply extracts a value out of the algebra in which it is embedded.
+</p>
+
+<p>
+Finally, <i>exchange</i>.
+</p>
+
+<p>
+\[\begin{align*}
+\mathcal{C} (\lambda x.\eta v) &\Rightarrow \eta (\lambda x.v)\tag{exchange}\\[3mm]
+\mathcal{C} (\lambda x.\mathtt{op} p k) &\Rightarrow \mathtt{op} p (\lambda y.\mathcal{C} (\lambda x. k y))\tag{exchange}\\
+&(\text{where}\ x \notin fv(p))
+\end{align*}\]
+</p>
+
+<p>
+Thus exchange turns an arrow of type \(\alpha \rightarrow \mathcal{F}_E(\beta)\) into a computation of type \(\mathcal{F}_E(\alpha \rightarrow \beta)\) by recursively commuting the index with the constructors of the calculus. As a result, exchange is a partial operation, applicable only if the index doesn't occur free in any of the parameters invoked inside the computation. 
+</p>
+
+<p>
+Given these additions, we may handle the sentence <i>every dog barked</i> using \(\mathtt{handleScope}\). Note that, to save space, we're skipping the step in which \(\eta\) is handled, since handling in that case is trivial (i.e., it involves simply replacing \(\eta\) with itself).
+</p>
+
+<p>
+\[\begin{align*}
+&\mathtt{handleScope} \IF{\textit{every dog barked}}\\
+=\ &\mathtt{handleScope} (\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x)))\\
+=\ &\Downarrow (\banana{\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} : \lambda q, k.\eta (q (\Downarrow (\mathcal{C} k))), \eta : \lambda x.\eta x}\\
+&\hspace{2cm}(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x))))\\
+=\ &\Downarrow ((\lambda q, k^\prime.\eta (q (\Downarrow (\mathcal{C} k^\prime)))) (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\eta (\textbf{bark} x)))\\
+=\ &\Downarrow ((\lambda k^\prime.\eta ((\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\Downarrow (\mathcal{C} k^\prime)))) (\lambda x.\eta (\textbf{bark} x)))\\
+=\ &\Downarrow (\eta ((\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\Downarrow (\mathcal{C} (\lambda x.\eta (\textbf{bark} x))))))\\
+=\ &\Downarrow (\eta ((\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\Downarrow (\eta (\lambda x.\textbf{bark} x)))))\\
+=\ &\Downarrow (\eta ((\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda x.\textbf{bark} x)))\\
+=\ &\Downarrow (\eta (\forall x.\textbf{dog} x \rightarrow \textbf{bark} x))\\
+=\ &\forall x.\textbf{dog} x \rightarrow \textbf{bark} x
+\end{align*}\]
+</p>
+
+<p>
+In the end, we've arrived at an ordinary formula of first-order logic representing the usual denotation assigned to <i>every dog barked</i>. We got there by first invoking the \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) operation via the noun phrase, then composing the sentence meaning using monadic composition, and, finally, handling the operation using \(\mathtt{handleScope}\). Importantly, we could have invoked \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) any number of times; e.g., twice, as in <i>every dog chased every cat</i>. Applying the handler would have resulted in the first instance of \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) being handled, followed by the second instance.
+</p>
+
+<p>
+So far, we have illustrated the algebraic approach to linguistic side effects in terms of an algebraic signature with only one operation, \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\). We'll soon look at a grammar invoking a signature with several operations, but let's first see how we can make the above approach to semantic composition look a little more familiar to the average Montague-style semanticist.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfc4efe9" class="outline-2">
+<h2 id="orgfc4efe9"><span class="section-number-2">2</span> Making it Montagovian<a id="org3e84c51"></a></h2>
+<div class="outline-text-2" id="text-2">
+<p>
+We'll attempt here to render some of the ideas illustrated above in the more familiar setting provided by the simply typed &lambda;-calculus (with products). The proposals of this section have been implemented as runnable Haskell code, which is available in full <a href="https://github.com/juliangrove/algebraic-effects-montague">here</a>, and relevant parts of which are presented throughout. Note that the following language pragmas are needed for the implementation of algebraic effects and handlers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #fe8019;">{-# LANGUAGE</span>
+<span style="color: #fe8019;">    DataKinds,</span>
+<span style="color: #fe8019;">    FlexibleContexts,</span>
+<span style="color: #fe8019;">    FlexibleInstances,</span>
+<span style="color: #fe8019;">    GADTs,</span>
+<span style="color: #fe8019;">    InstanceSigs,</span>
+<span style="color: #fe8019;">    MultiParamTypeClasses,</span>
+<span style="color: #fe8019;">    RankNTypes,</span>
+<span style="color: #fe8019;">    ScopedTypeVariables,</span>
+<span style="color: #fe8019;">    TypeApplications,</span>
+<span style="color: #fe8019;">    TypeFamilies,</span>
+<span style="color: #fe8019;">    TypeOperators,</span>
+<span style="color: #fe8019;">    UndecidableInstances #-}</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org0ba105d" class="outline-3">
+<h3 id="org0ba105d"><span class="section-number-3">2.1</span> Computation types</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+To start, we'll define our computation types as values of a function \(\mathcal{F}_l(v)\), where \(l\) is a parameter consisting of a list of types of the form \(p_i ⤚ a_i\). \(\mathcal{F}_l(v)\) is defined as follows, where \(\epsilon\) is the empty list, and \(o\) is an arbitrary type. (Thus, fixing \(v\), computation types act like equivalence classes of simple types that are agnostic about what \(o\) is).
+</p>
+
+<p>
+\[\begin{align*}
+\mathcal{F}_{\epsilon}(v) &= v\\
+\mathcal{F}_{p ⤚ a, l}(v) &= (p \rightarrow (a \rightarrow \mathcal{F}_l(v)) \rightarrow o) \rightarrow o
+\end{align*}\]
+</p>
+
+<p>
+Thus any computation whose type is derived from the parameter \(\epsilon\) is trivial; it just returns a value. To see what a computation whose type is derived from a complex parameter looks like, let's consider the parameter \((e \rightarrow t) \rightarrow t ⤚ e, (e \rightarrow t) \rightarrow t ⤚ e\). Any such computation is a &lambda;-term of the following type.
+</p>
+
+<p>
+\[\begin{align*}
+&\mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e, (e \rightarrow t) \rightarrow t ⤚ e}(v)\\
+=\ \ &(((e \rightarrow t) \rightarrow t ) \rightarrow (e \rightarrow \mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e}(v)) \rightarrow o) \rightarrow o\\
+=\ \ &(((e \rightarrow t) \rightarrow t ) \rightarrow (e \rightarrow (((e \rightarrow t) \rightarrow t ) \rightarrow (e \rightarrow \mathcal{F}_\epsilon(v) \rightarrow o^\prime) \rightarrow o^\prime) \rightarrow o) \rightarrow o\\
+=\ \ &(((e \rightarrow t) \rightarrow t ) \rightarrow (e \rightarrow (((e \rightarrow t) \rightarrow t ) \rightarrow (e \rightarrow v \rightarrow o^\prime) \rightarrow o^\prime) \rightarrow o) \rightarrow o
+\end{align*}\]
+</p>
+
+<p>
+If we set \(v\) to the type \(t\) of truth values, a term of this type might be the following one. (As will become evident, this term represents the meaning of the sentence <i>every dog chased every cat</i>.)
+</p>
+
+<p>
+\[\lambda h.h (\lambda k.\forall x.\textbf{dog} x \rightarrow k x) (\lambda y, h^\prime.h^\prime (\lambda k.\forall x.\textbf{cat} x \rightarrow k x) (\lambda z.\textbf{chase} z y))\]
+</p>
+
+<p>
+Such a format for representing computations may look reminiscent of the system presented in &sect;<a href="#orgef3a691">1</a>, but with two crucially new conventions. First, operations are now represented by &lambda;-abstracted variables. The choice of variable name \(h\) is meant to suggest that operations act as functions on their handlers; indeed, interpreting an operation in terms of a handler, from this perspective, is just a matter of passing the handler to the operation (encoded as a &lambda;-abstraction). Second, the parameters of computation types now explicitly represent how many times particular operations are invoked, and in what order. The computation type \(\mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e, (e \rightarrow t) \rightarrow t ⤚ e}(t)\), for instance, is the type of a computation which invokes the \(\mathtt{scope}\) operation <i>twice</i> before returning a value of type \(t\).
+</p>
+
+<p>
+Thus there is a somwhat indirect relationship between the parameter \(l\) of a computation type \(\mathcal{F}_l(v)\) and an algebraic signature: the parameter describes the operations invoked in a computation (in the order in which they are invoked) and, hence, the operations contained in the smallest algebraic signature with which the computation is compatible. The parameter \(\epsilon\) indicates that no operations are invoked; such a computation (which merely returns a value) is thus compatible with <i>any</i> algebraic signature. Meanwhile, the parameter \(p_1 ⤚ a_1, \ldots, p_n ⤚ a_n\) indicates that operations with those types are invoked (in that order); such a computation is compatible with any algebraic signature, as long as it contains operations with the types \(p_1 ⤚ a_1, \ldots, p_n ⤚ a_n\).
+</p>
+
+<p>
+In Haskell, we may encode \(\mathcal{F}_l(v)\) as a generalized algebraic data type.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | The data type of effectful computations.</span>
+<span style="color: #fb4933;">data</span> <span style="color: #d3869b;">F</span> l v <span style="color: #fb4933;">where</span>
+  <span style="color: #d3869b;">Pure</span> <span style="color: #83a598;">::</span> v <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> '<span style="color: #d3869b;">[]</span> v
+  <span style="color: #d3869b;">Impure</span> <span style="color: #83a598;">::</span> (<span style="color: #fb4933;">forall</span> o <span style="color: #83a598;">.</span> (p <span style="color: #83a598;">-&gt;</span> (a <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l v) <span style="color: #83a598;">-&gt;</span> o) <span style="color: #83a598;">-&gt;</span> o) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> (p <span style="color: #83a598;">&gt;--</span> a '<span style="color: #d3869b;">:</span> l) v
+</pre>
+</div>
+
+<p>
+We have two constructors: <i>Pure</i>, for trivial (i.e., pure) computations that return values, and <i>Impure</i>, for those which invoke an operation before continuing with the rest of the computation. Note that we invoke explicit quantification over the type \(o\) to encode the GADT, rather than simply allow it to be arbitrary, as above. Type-quantificationais a necessary feature of the Haskell implementation, since the GADT would otherwise hide the type \(o\), forcing on it an existential interpretation.
+</p>
+
+<p>
+Given our encoding of computations with algebraic effects into the simply typed &lambda;-calculus, we ought to provide a way of composing them analogous to what we had in &sect;<a href="#orgef3a691">1</a>. Fortunately, the relevant compositional scheme is straightforward: just as algebraic effects normally give rise to monads, our encoding gives rise to graded monads.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga18003b" class="outline-3">
+<h3 id="orga18003b"><span class="section-number-3">2.2</span> Graded monads</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Graded monads generalize monads in order to associate with each computation type an <i>effect</i> that parameterizes it with fine-grained information about the nature of the relevant side effect. Concretely, a graded monad is a family of functors \(G : \mathcal{E} \rightarrow \mathcal{T} \rightarrow \mathcal{T}\), parameterized by a monoid \(\mathcal{E}\) of effects. Then given some \(e \in \mathcal{E}\), \(G_e\) is an endofunctor on the category \(\mathcal{T}\) of types. Associated with each graded monad are two operators, \((\cdot)^\eta\) and \(\bind\), having the following type-signatures (where \(\mathtt{0}\) and \(+\) are, respectively, the identity and associative operation of the monoid \(\mathcal{E}\)).
+</p>
+
+<p>
+\[\begin{align*}
+(\cdot)^\eta &: v \rightarrow G_\mathtt{0}(v)\\
+(\bind) &: G_e(v) \rightarrow (v \rightarrow G_f(w)) \rightarrow G_{e+f}(w)
+\end{align*}\]
+</p>
+
+<p>
+These operators are required to satisfy the <i>graded monad laws</i>, which are identical in form to the laws for ordinary monads, modulo the manipulation of effects.<sup><a id="fnr.6" class="footref" href="#fn.6">6</a></sup>
+</p>
+
+<p>
+In our case, the relevant graded monad consists of the function \(\mathcal{F} : {\mathcal{T}_⤚}^* \rightarrow \mathcal{T} \rightarrow \mathcal{T}\), whose effects are given by \({\mathcal{T}_⤚}^*\), the free monoid (i.e., of lists) over \(\mathcal{T}_⤚ = \{p ⤚ a \divd p, a \in \mathcal{T}\}\). Given any effect \(l \in {\mathcal{T}_⤚}^*\), \(\mathcal{F}_l\) is indeed a functor, as witnessed by the following definition of \(\mathtt{map}_{\mathcal{F}_l}\).
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{map}_{\mathcal{F}_l} &: (v \rightarrow w) \rightarrow \mathcal{F}_l(v) \rightarrow \mathcal{F}_l(w)\\
+\mathtt{map}_{\mathcal{F}_\epsilon} f v &= f v\tag{injection}\\
+\mathtt{map}_{\mathcal{F}_{p ⤚ a, l}} f m &= \lambda h.m (\lambda p, k.h p (\lambda a.\mathtt{map}_{\mathcal{F}_l} f (k a)))\tag{operation}
+\end{align*}\]
+</p>
+
+<p>
+(Accordingly, we may write the following <i>Functor</i> instance in Haskell.)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | For any effect l, F l is a </span><span style="color: #b8bb26; font-style: italic;">/Functor/</span><span style="color: #b8bb26;">.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Functor</span> (<span style="color: #d3869b;">F</span> l) <span style="color: #fb4933;">where</span>
+  fmap f (<span style="color: #d3869b;">Pure</span> v) <span style="color: #83a598;">=</span> <span style="color: #d3869b;">Pure</span> <span style="color: #83a598;">$</span> f v
+  fmap f (<span style="color: #d3869b;">Impure</span> m) <span style="color: #83a598;">=</span> <span style="color: #d3869b;">Impure</span> <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span>h <span style="color: #83a598;">-&gt;</span> m <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span>p k <span style="color: #83a598;">-&gt;</span> h p (<span style="color: #83a598;">\</span>a <span style="color: #83a598;">-&gt;</span> fmap f <span style="color: #83a598;">$</span> k a)
+</pre>
+</div>
+
+<p>
+The fact that \(\mathcal{F}\) is a graded monad is exhibited, first, by the following definition of \((\cdot)^\eta\),
+</p>
+
+<p>
+\[\begin{align*}
+(\cdot)^\eta &: v \rightarrow \mathcal{F}_\epsilon(v)\\
+v^\eta &= v
+\end{align*}\]
+</p>
+
+<p>
+and second, by the following definition of \(\bind\).
+</p>
+
+<p>
+\[\begin{align*}
+(\bind) &: \mathcal{F}_{l_1}(v) \rightarrow (v \rightarrow \mathcal{F}_{l_2}(w)) \rightarrow \mathcal{F}_{l_1, l_2}(w)\\
+v \bind k &= k v\tag{injection}\\
+m \bind k &= \lambda h.m (\lambda p, k^\prime.h p (\lambda a.k^\prime a \bind k))\tag{operation}
+\end{align*}\]
+</p>
+
+<p>
+In Haskell, we may write the corresponding instance for the <i>Effect</i> class of [<a href="#orchard_embedding_2014">Orchard and Petricek, 2014</a>] for graded monads. <i>(:++)</i>, which provides the associative operation of the relevant monoid, is concatenation on type-level lists.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Computations with algebraic effects form a graded monad.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Effect</span> <span style="color: #d3869b;">F</span> <span style="color: #fb4933;">where</span>
+  <span style="color: #fb4933;">type</span> <span style="color: #d3869b;">Unit</span> <span style="color: #d3869b;">F</span> <span style="color: #83a598;">=</span> '<span style="color: #d3869b;">[]</span> <span style="color: #7c6f64;">-- </span><span style="color: #7c6f64;">The monoidal unit.</span>
+  <span style="color: #fb4933;">type</span> <span style="color: #d3869b;">Plus</span> <span style="color: #d3869b;">F</span> l1 l2 <span style="color: #83a598;">=</span> l1 <span style="color: #d3869b;">:++</span> l2 <span style="color: #7c6f64;">-- </span><span style="color: #7c6f64;">The monoidal associative operation.</span>
+
+  return <span style="color: #83a598;">::</span> v <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> '<span style="color: #d3869b;">[]</span> v
+  return v  <span style="color: #83a598;">=</span> <span style="color: #d3869b;">Pure</span> v
+
+  (<span style="color: #83a598;">&gt;&gt;=</span>) <span style="color: #83a598;">::</span> <span style="color: #d3869b;">F</span> l1 v <span style="color: #83a598;">-&gt;</span> (v <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l2 w) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> (l1 <span style="color: #d3869b;">:++</span> l2) w
+  <span style="color: #d3869b;">Pure</span> v <span style="color: #83a598;">&gt;&gt;=</span> k <span style="color: #83a598;">=</span> k v <span style="color: #7c6f64;">-- </span><span style="color: #7c6f64;">(injection)</span>
+  <span style="color: #d3869b;">Impure</span> m <span style="color: #83a598;">&gt;&gt;=</span> k <span style="color: #83a598;">=</span> <span style="color: #d3869b;">Impure</span> <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span>h <span style="color: #83a598;">-&gt;</span> m <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span>p k' <span style="color: #83a598;">-&gt;</span> h p (<span style="color: #83a598;">\</span>a <span style="color: #83a598;">-&gt;</span> k' a <span style="color: #83a598;">&gt;&gt;=</span> k) <span style="color: #7c6f64;">-- </span><span style="color: #7c6f64;">(operation)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb590131" class="outline-3">
+<h3 id="orgb590131"><span class="section-number-3">2.3</span> Operations</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+At this point, it is useful to define the operations that will be the basis of the linguistic example presented &sect;<a href="#org4e30ec2">3</a>. We can understand operations associated with the type \(p ⤚ a\) as simply typed &lambda;-terms with the following type (where \(v\) is an arbitrary value type and \(l\) may be any effect).
+</p>
+
+<p>
+\[p \rightarrow (a \rightarrow \mathcal{F}_l(v)) \rightarrow \mathcal{F}_{p ⤚ a, l}(v)\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | The type of an operation taking parameter p and a-many arguments.</span>
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">Operation</span> p a <span style="color: #83a598;">=</span> <span style="color: #fb4933;">forall</span> l v <span style="color: #83a598;">.</span> p <span style="color: #83a598;">-&gt;</span> (a <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l v) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> (p <span style="color: #83a598;">&gt;--</span> a '<span style="color: #d3869b;">:</span> l) v
+</pre>
+</div>
+
+<p>
+Any given operation will therefore be rendered as a &lambda;-term with the following shape.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{op}_{p ⤚ a} &: p \rightarrow (a \rightarrow \mathcal{F}_l(v)) \rightarrow \mathcal{F}_{p ⤚ a, l}(v)\\
+\mathtt{op}_{p ⤚ a}(p; k) &= \lambda h.h p k
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Operations take a parameter, p, and a-many arguments. Handlers then use the</span>
+<span style="color: #b8bb26;">-- parameter to choose which arguments they will further handle.</span>
+<span style="color: #fabd2f;">op</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Operation</span> p a
+<span style="color: #fabd2f;">op</span> p k <span style="color: #83a598;">=</span> <span style="color: #d3869b;">Impure</span> <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span>h <span style="color: #83a598;">-&gt;</span> h p k
+</pre>
+</div>
+
+<p>
+Given a parameter \(p\) and a continuation \(k\) (associated with arity \(a\)), the operation builds a new computation, i.e., element of an algebra whose signature is compatible with the effect \(p ⤚ a, l\). Any given operation is associated with a <i>computation</i> that simply invokes the operation on some parameter and returns a result. Given an operation associated with the type \(p ⤚ a\), and a parameter \(p\) (of type \(p\)), the corresponding computation is given by the following abbreviation \(\mathtt{comp}_{p ⤚ a}\).
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{comp}_{p ⤚ a} &: p \rightarrow \mathcal{F}_{p ⤚ a}(a)\\
+\mathtt{comp}_{p ⤚ a} p &= \mathtt{op}_{p ⤚ a}(p; \lambda a.a)
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | The type of a computation consisting of a single operation.</span>
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">Computation</span> p a <span style="color: #83a598;">=</span> p <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> '[p <span style="color: #83a598;">&gt;--</span> a] a
+
+<span style="color: #b8bb26;">-- | Computations (of one operation) just perform the operation and return the</span>
+<span style="color: #b8bb26;">-- result.</span>
+<span style="color: #fabd2f;">comp</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Computation</span> p a
+<span style="color: #fabd2f;">comp</span> p <span style="color: #83a598;">=</span> op p return
+</pre>
+</div>
+
+<p>
+That is, the computation invokes the operation and continues with the <i>return</i> of the graded monad. Any operation may then be recovered from its associated computation by binding it to the relevant continuation, i.e., as
+</p>
+
+<p>
+\[\mathtt{op}_{p ⤚ a}(p; k) = \mathtt{comp}_{p ⤚ a} p \bind k\]
+</p>
+
+<p>
+For the linguistic example we consider in &sect;<a href="#org4e30ec2">3</a>, we will deal specifically with the operations associated with <i>state</i> (&sect;<a href="#orgb221447">2.3.1</a>) and <i>quantification</i> (&sect;<a href="#orgcac5319">2.3.2</a>).
+</p>
+</div>
+
+<div id="outline-container-orgdcef9fc" class="outline-4">
+<h4 id="orgdcef9fc"><span class="section-number-4">2.3.1</span> State<a id="orgb221447"></a></h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+The state algebra consists of operations for reading from and writing to an environment of some designated type. Given a type \(s\) of the environment, there are two state operations, \(\mathtt{get}_{\star ⤚ s}\), which reads from the environment, and \(\mathtt{put}_{s ⤚ \star}\), which writes to the environment. (Recall that \(\star\) is the unit type; it is inhabited by a single element, also called \(\star\).) In our linguistic example, we'll use these operations to manage anaphora. Thus we can take the environment to be a list of individuals, whose type we'll call \(\gamma\) (following [<a href="#degroote_towards_2006">de&nbsp;Groote, 2006</a>]).
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{get}_{\star ⤚ \gamma} &: \star \rightarrow (\gamma \rightarrow \mathcal{F}_l(v)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, l}(v)\\
+\mathtt{get}_{\star ⤚ \gamma}(\star; k) &= \lambda h.h \star k\\[3mm]
+\mathtt{put}_{\gamma ⤚ \star} &: \gamma \rightarrow (\star \rightarrow \mathcal{F}_l(v)) \rightarrow \mathcal{F}_{\gamma ⤚ \star, l}(v)\\
+\mathtt{put}_{\gamma ⤚ \star}(g; k) &= \lambda h.h g k
+\end{align*}\]
+</p>
+
+<p>
+\(\gamma\) corresponds, in Haskell, to the type of lists of entities.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #fabd2f;">get</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Operation</span> <span style="color: #d3869b;">()</span> [<span style="color: #d3869b;">Entity</span>]
+<span style="color: #fabd2f;">get</span> <span style="color: #83a598;">=</span> op
+
+<span style="color: #fabd2f;">put</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Operation</span> [<span style="color: #d3869b;">Entity</span>] <span style="color: #d3869b;">()</span>
+<span style="color: #fabd2f;">put</span> <span style="color: #83a598;">=</span> op
+</pre>
+</div>
+
+<p>
+Corresponding to these operations are their associated computations, which, we'll call \(\mathtt{get}^\prime_{\star ⤚ \gamma}\) and \(\mathtt{put}^\prime_{\gamma ⤚ \star}\).
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{get}^\prime_{\star ⤚ \gamma} &: \star \rightarrow \mathcal{F}_{\star ⤚ \gamma}(\gamma)\\
+\mathtt{get}^\prime_{\star ⤚ \gamma} \star &= \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.g)\\
+&= \lambda h.h \star (\lambda g.g)\\[3mm]
+\mathtt{put}^\prime_{\gamma ⤚ \star} &: \gamma \rightarrow \mathcal{F}_{\gamma ⤚ \star}(\star)\\
+\mathtt{put}^\prime_{\gamma ⤚ \star} g &= \mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.\star)\\
+&= \lambda h.h g (\lambda\star.\star)
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #fabd2f;">get'</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Computation</span> <span style="color: #d3869b;">()</span> [<span style="color: #d3869b;">Entity</span>]
+<span style="color: #fabd2f;">get'</span> <span style="color: #83a598;">=</span> comp
+
+<span style="color: #fabd2f;">put'</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Computation</span> [<span style="color: #d3869b;">Entity</span>] <span style="color: #d3869b;">()</span>
+<span style="color: #fabd2f;">put'</span> <span style="color: #83a598;">=</span> comp
+</pre>
+</div>
+
+<p>
+In terms of these, we can write a simple program, \((\cdot)^\triangleright\) (called 'bind'), which, given a computation returning an entity, reads the environment and updates it by making the returned entity live for anaphora. (The function \(\append{\ }{\ }\) is used to append an entity (on the left) to the environment (on the right).)
+</p>
+
+<p>
+\[\begin{align*}
+(\cdot)^\triangleright &: \mathcal{F}_l(e) \rightarrow \mathcal{F}_{l, \star ⤚ \gamma, \gamma ⤚ \star}(e)\\
+m^\triangleright &= m \bind \lambda x.\mathtt{get}^\prime_{\star ⤚ \gamma} \star \bind \lambda g.\mathtt{put}^\prime_{\gamma ⤚ \star} (\append{x}{g}) \bind \lambda\star.x\\
+(\ &= m \bind \lambda x.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{x}{g}; \lambda\star.x))\ \ )\\
+(\ &= m \bind \lambda x, h.h \star (\lambda g, h^\prime.h^\prime (\append{x}{g}) (\lambda\star.x))\ \ )
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Make a computation returning an 'Entity' live for anaphora.</span>
+<span style="color: #fabd2f;">bind</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">F</span> l <span style="color: #d3869b;">Entity</span> <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> (l <span style="color: #d3869b;">:++</span> [<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>]) <span style="color: #d3869b;">Entity</span>
+<span style="color: #fabd2f;">bind</span> m <span style="color: #83a598;">=</span> m <span style="color: #83a598;">&gt;&gt;=</span> <span style="color: #83a598;">\</span>x <span style="color: #83a598;">-&gt;</span>
+         get' <span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;&gt;=</span> <span style="color: #83a598;">\</span>g <span style="color: #83a598;">-&gt;</span>
+         put' (x<span style="color: #d3869b;">:</span>g) <span style="color: #83a598;">&gt;&gt;</span>
+         return x
+</pre>
+</div>
+
+<p>
+Thus \((\cdot)^\triangleright\) reads in the entity returned by its input, gets the current environment, puts a new environment (consisting of the entity appended to the old environment), and, finally, returns the entity again. Note that the effect associated with the resulting computation is just whatever the effect \(l\) associated with the input is, but concatenated on the left with the effect \(\star ⤚ \gamma, \gamma ⤚ \star\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb1dc8c3" class="outline-4">
+<h4 id="orgb1dc8c3"><span class="section-number-4">2.3.2</span> Quantification<a id="orgcac5319"></a></h4>
+<div class="outline-text-4" id="text-2-3-2">
+<p>
+To add quantification to the grammar, we'll use an operation \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\), analogous to the identically named operation of &sect;<a href="#orgef3a691">1</a>. The following definitions of \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) and its corresponding computation, \(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e}\), are determined by the associated parameter and arity.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} &: ((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow \mathcal{F}_l(v)) \rightarrow \mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e, l}(v)\\
+\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}(q; k) &= \lambda h.h q k\\[3mm]
+\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} &: ((e \rightarrow t) \rightarrow t) \rightarrow \mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e}(e)\\
+\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} q &= \mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}(q; \lambda x.x)\\
+&= \lambda h.h q (\lambda x.x)
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #fb4933;">type</span> <span style="color: #d3869b;">Quantifier</span> <span style="color: #83a598;">=</span> (<span style="color: #d3869b;">Entity</span> <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">Bool</span>) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">Bool</span>
+
+<span style="color: #fabd2f;">scope</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Operation</span> <span style="color: #d3869b;">Quantifier</span> <span style="color: #d3869b;">Entity</span>
+<span style="color: #fabd2f;">scope</span> <span style="color: #83a598;">=</span> op
+
+<span style="color: #fabd2f;">scope'</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Computation</span> <span style="color: #d3869b;">Quantifier</span> <span style="color: #d3869b;">Entity</span>
+<span style="color: #fabd2f;">scope'</span> <span style="color: #83a598;">=</span> comp
+</pre>
+</div>
+
+<p>
+The \(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e}\) computation thus takes a quantifier meaning \(q\) as a parameter and acts, at the level of values, as an entity.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbfdacd2" class="outline-3">
+<h3 id="orgbfdacd2"><span class="section-number-3">2.4</span> Handlers</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+In total we have three operations, \(\mathtt{get}_{\star ⤚ \gamma}\), \(\mathtt{put}_{\gamma ⤚ \star}\), and \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\); what we need now is a way to handle them. Recall from &sect;<a href="#orgef3a691">1</a> that handlers have the following shape,
+</p>
+
+<p>
+\[\banana{(\mathtt{op}_i : M_i)_{i \in I}, \eta : N}\]
+</p>
+
+<p>
+where \((\mathtt{op}_i : M_i)_{i \in I}\) is some collection of operations in one algebra, associated with the terms which interpret them in another. (Recall that \(\eta : N\) means that the handler interprets pure values \(v\) as \(N v\).) In this subsection, I will outline a general procedure for translating arbitrary handlers with this shape into the simply typed &lambda;-calculus in a way compatible with the given encoding of operations and computations. In particular, any given handler will be encoded as a function of type \(\mathcal{F}_{l_{in}}(v_{in}) \rightarrow \mathcal{F}_{l_{out}}(v_{out})\) that takes a computation to handle as its input in order to produce an interpretation for that computation in the new algebra as its output. 
+</p>
+
+<p>
+It helps to show the encoding of a handler by first representing it as a tuple holding its individual interpreters. Thus we will start by representing an arbitrary handler, as given above, in terms of the following tuple.
+</p>
+
+<p>
+\[\langle M_1, \ldots, M_{|I|}, N\rangle\]
+</p>
+
+<p>
+The tuple provides a kind of middleman while we build the &lambda;-term corresponding to the handler. To encode the handler, we'll need the ability to retrieve the components of this tuple when the encoding requires them. Thus we'll require the following function, \(\mathtt{retrieve}\).
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{retrieve} &: m_1 \times \ldots \times m_{|I|} \times n \rightarrow o\ \ (\text{where}\ o \in \{m_1, \ldots, m_{|I|}, n\})\\
+\mathtt{retrieve} \langle\ldots O \ldots\rangle &= O
+\end{align*}\]
+</p>
+
+<p>
+This scheme can be implemented in Haskell in terms of the following class.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | The class of handlers whose individual interpreters may be retrieved.</span>
+<span style="color: #fb4933;">class</span> <span style="color: #d3869b;">Retrievable</span> interpreter handler <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">::</span> handler <span style="color: #83a598;">-&gt;</span> interpreter
+</pre>
+</div>
+
+<p>
+The tuple corresponding to a handler has two types of components: those interpreting operations, and one final one interpreting values. In both cases, we wish to interpret the source (operation or value) in some target algebra, i.e., one whose signature is compatible with some predetermined effect \(l\). Thus we have the following types for the interpreters which are the components of such a tuple.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | A type for operation interpreters.</span>
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">InterpretOp</span> p a l v <span style="color: #83a598;">=</span> p <span style="color: #83a598;">-&gt;</span> (a <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l v) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l v
+
+<span style="color: #b8bb26;">-- | A type for value interpreters.</span>
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">InterpretVal</span> l v1 v2 <span style="color: #83a598;">=</span> v1 <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l v2
+</pre>
+</div>
+
+<p>
+For our case, we will require a handler that interprets computations from the {\(\mathtt{get}_{\star ⤚ \gamma}\), \(\mathtt{put}_{\gamma ⤚ \star}\), \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\)}-algebra as simpler computations that invoke exactly one \(\mathtt{get}_{\star ⤚ \gamma}\) and exactly one \(\mathtt{put}_{\gamma ⤚ \star}\); that is, computations whose types are parameterized by the effect \(\star ⤚ \gamma, \gamma ⤚ \star\), and which thus have the following shape (where \(g^\prime\) is some environment and \(v\) is some value, both possibly depending on the input \(g\) in some way).
+</p>
+
+<p>
+\[\begin{align*}
+&\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g^\prime; \lambda\star, v))\\
+=\ \ &\lambda h.h \star (\lambda g, h^\prime.h^\prime g^\prime (\lambda\star.v))
+\end{align*}\]
+</p>
+
+<p>
+Such simpler computations are "fully interpreted", insofar as they correspond exactly to computations in the State monad. In particular, the above &lambda;-term may be viewed as an alternative notation for the following Stateful program.
+</p>
+
+<p>
+\[\lambda g.\langle v, g^\prime\rangle\]
+</p>
+
+<p>
+Accordingly, we will interpret values by simply returning them in (our encoding of) the State monad; that is, using the following interpreter.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{interpretStVal} &: v \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)\\
+\mathtt{interpretStVal} &= \lambda v.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.v))\\
+&= \lambda v, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.v))
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #fb4933;">type</span> <span style="color: #d3869b;">InterpretStVal</span> v <span style="color: #83a598;">=</span> <span style="color: #d3869b;">InterpretVal</span> '[<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>] v v
+
+<span style="color: #b8bb26;">-- | Interpret a value.</span>
+<span style="color: #fabd2f;">interpretStVal</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">InterpretStVal</span> v
+<span style="color: #fabd2f;">interpretStVal</span> <span style="color: #83a598;">=</span> <span style="color: #83a598;">\</span>v <span style="color: #83a598;">-&gt;</span> get <span style="color: #d3869b;">()</span> (<span style="color: #83a598;">\</span>g <span style="color: #83a598;">-&gt;</span> put g (<span style="color: #83a598;">\</span><span style="color: #d3869b;">()</span> <span style="color: #83a598;">-&gt;</span> return v))
+</pre>
+</div>
+
+<p>
+That is, the interpreter for values yields a computation corresponding to the following program, given a value \(v\).
+</p>
+
+<p>
+\[\lambda g.\langle v, g\rangle\]
+</p>
+
+<p>
+Analogously, the interpreters for operations have the following types.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #fb4933;">type</span> <span style="color: #d3869b;">InterpretStOp</span> p a v <span style="color: #83a598;">=</span> <span style="color: #d3869b;">InterpretOp</span> p a '[<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>] v
+
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">InterpretStGet</span> v <span style="color: #83a598;">=</span> <span style="color: #d3869b;">InterpretStOp</span> <span style="color: #d3869b;">()</span> [<span style="color: #d3869b;">Entity</span>] v
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">InterpretStPut</span> v <span style="color: #83a598;">=</span> <span style="color: #d3869b;">InterpretStOp</span> [<span style="color: #d3869b;">Entity</span>] <span style="color: #d3869b;">()</span> v
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">InterpretStScope</span> <span style="color: #83a598;">=</span> <span style="color: #d3869b;">InterpretStOp</span> <span style="color: #d3869b;">Quantifier</span> <span style="color: #d3869b;">Entity</span> <span style="color: #d3869b;">Bool</span>
+</pre>
+</div>
+
+<p>
+An interpreter for \(\mathtt{get}_{\star ⤚ \gamma}\), for instance, will be of type \(\star \rightarrow (\gamma \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)\). In particular, we may interpret it as follows.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{interpretStGet} &: \star \rightarrow (\gamma \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)\\
+\mathtt{interpretStGet} &= \lambda\star, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.k g (\lambda\star, k^\prime.k^\prime g))\\
+(\ &= \lambda\star, k, h.h \star (\lambda g.k g (\lambda\star, k^\prime.k^\prime g))\ \ )
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Interpret a 'get' occurrence.</span>
+<span style="color: #fabd2f;">interpretStGet</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">InterpretGet</span> v
+<span style="color: #fabd2f;">interpretStGet</span> <span style="color: #83a598;">=</span> <span style="color: #83a598;">\</span><span style="color: #d3869b;">()</span> k <span style="color: #83a598;">-&gt;</span> get <span style="color: #d3869b;">()</span> (<span style="color: #83a598;">\</span>g <span style="color: #83a598;">-&gt;</span> <span style="color: #fb4933;">case</span> k g <span style="color: #fb4933;">of</span>
+                                          <span style="color: #d3869b;">Impure</span> m <span style="color: #83a598;">-&gt;</span> m <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span><span style="color: #d3869b;">()</span> k' <span style="color: #83a598;">-&gt;</span> k' g)
+</pre>
+</div>
+
+<p>
+Thus we interpret a \(\mathtt{get}_{\star ⤚ \gamma}\) by building a computation of type \(\mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)\) that feeds its (interpreted) continuation of type \(\gamma \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)\) the first gotten environment of the computation, after which it, again, feeds this environment to the outer \(\mathtt{get}_{\star ⤚ \gamma}\)  of the result.
+</p>
+
+<p>
+The interpretation of \(\mathtt{put}_{\gamma ⤚ \star}\) is analagous.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{interpretStPut} &: \gamma \rightarrow (\star \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(v)\\
+\mathtt{interpretStPut} &= \lambda g, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g^\prime.k \star (\lambda\star, k^\prime.k^\prime g))\\
+(\ &= \lambda g, k, h.h \star (\lambda g^\prime.k \star (\lambda\star, k^\prime.k^\prime g))\ \ )
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Interpret a 'put' occurrence.</span>
+<span style="color: #fabd2f;">interpretStPut</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">InterpretPut</span> v
+<span style="color: #fabd2f;">interpretStPut</span> <span style="color: #83a598;">=</span> <span style="color: #83a598;">\</span>g k <span style="color: #83a598;">-&gt;</span> get <span style="color: #d3869b;">()</span> (<span style="color: #83a598;">\</span>g' <span style="color: #83a598;">-&gt;</span> <span style="color: #fb4933;">case</span> k <span style="color: #d3869b;">()</span> <span style="color: #fb4933;">of</span>
+                                          <span style="color: #d3869b;">Impure</span> m <span style="color: #83a598;">-&gt;</span> m <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span><span style="color: #d3869b;">()</span> k' <span style="color: #83a598;">-&gt;</span> k' g)
+</pre>
+</div>
+
+<p>
+In this case, the \(\mathtt{put}_{\gamma ⤚ \star}\) occurrence is interpreted by plugging its (interpreted) continuation with \(\star\) and then feeding the environment it puts to the outer \(\mathtt{get}_{\star ⤚ \gamma}\) of the result. Doing so ensures that \(\mathtt{put}_{\gamma ⤚ \star}\) has the required effect on the resulting computation; i.e., that of dictating its input.
+</p>
+
+<p>
+Finally, we have the following interpretation for \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\).
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{interpretStScope} &: ((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
+\mathtt{interpretStScope} &= \lambda q, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.q (\lambda x.k x (\lambda\star, k^\prime.k^\prime g (\lambda g^\prime, k^{\prime\prime}.k^{\prime\prime} \star)))))\\
+(\ &= \lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.k x (\lambda\star, k^\prime.k^\prime g (\lambda g^\prime, k^{\prime\prime}.k^{\prime\prime} \star)))))\ \ )
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Interpret a 'scope' occurrence.</span>
+<span style="color: #fabd2f;">interpretStScope</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">InterpretScope</span>
+<span style="color: #fabd2f;">interpretStScope</span> <span style="color: #83a598;">=</span> <span style="color: #83a598;">\</span>q k <span style="color: #83a598;">-&gt;</span>
+                 get <span style="color: #d3869b;">()</span> (<span style="color: #83a598;">\</span>g <span style="color: #83a598;">-&gt;</span>
+                 put g (<span style="color: #83a598;">\</span><span style="color: #d3869b;">()</span> <span style="color: #83a598;">-&gt;</span>
+                 return (q <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span>x <span style="color: #83a598;">-&gt;</span> <span style="color: #fb4933;">case</span> k x <span style="color: #fb4933;">of</span>
+                                     <span style="color: #d3869b;">Impure</span> m <span style="color: #83a598;">-&gt;</span> m <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span><span style="color: #fb4933;">_</span> k' <span style="color: #83a598;">-&gt;</span>
+                                       <span style="color: #fb4933;">case</span> k' g <span style="color: #fb4933;">of</span>
+                                         <span style="color: #d3869b;">Impure</span> m' <span style="color: #83a598;">-&gt;</span> m' <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span><span style="color: #fb4933;">_</span> k'' <span style="color: #83a598;">-&gt;</span>
+                                           <span style="color: #fb4933;">case</span> k'' <span style="color: #d3869b;">()</span> <span style="color: #fb4933;">of</span>
+                                             <span style="color: #d3869b;">Pure</span> a <span style="color: #83a598;">-&gt;</span> a)))
+</pre>
+</div>
+
+<p>
+Thus, in order to interpret an occurrence of \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\), we must essentially push the \((e \rightarrow t) \rightarrow t\) -type quantifier meaning down past the \(\mathtt{get}_{\star ⤚ \gamma}\) and \(\mathtt{put}_{\gamma ⤚ \star}\) of the resulting computation so that it may gain access to a continuation of type \(e \rightarrow t\). The implication of using such an interpreter for \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\) effects is that quantifier meanings may only be handled inside computations whose value type is \(t\), i.e., at sentence boundaries. An immediate consequence of pushing quantifier meanings down past \(\mathtt{get}_{\star ⤚ \gamma}\) and \(\mathtt{put}_{\gamma ⤚ \star}\) (a maneuver which has been forced upon us by the types!) is that dynamic effects incurred within the quantifier's scope are lost outside of it. In other words, allowing quantifier meanings access to a scope of the right type forces a situation in which they may be live candidates for anaphora inside of their scope, but not outside of it. We have thus derived (from their types!) that quantifier meanings are internally dynamic, but externally static, with respect to anaphora. This situation does not hold for ordinary anaphora, i.e., to individual-denoting expressions, whose side effects are captured in the resulting State-monadic algebra, rendering them dynamic.<sup><a id="fnr.7" class="footref" href="#fn.7">7</a></sup>
+</p>
+
+<p>
+We may now construct the tuple determining our handler as follows.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{getPutScopeHandler} = \langle&\mathtt{interpretStGet},\\
+&\mathtt{interpretStPut},\\
+&\mathtt{interpretStScope},\\
+&\mathtt{interpretStVal}\rangle
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | The type of handlers for computations possibly featuring 'get', 'put', and</span>
+<span style="color: #b8bb26;">-- 'scope'.</span>
+<span style="color: #fb4933;">type</span> <span style="color: #d3869b;">GetPutScopeHandler</span>
+  <span style="color: #83a598;">=</span> (<span style="color: #d3869b;">InterpretGet</span> <span style="color: #d3869b;">Bool</span>,
+      (<span style="color: #d3869b;">InterpretPut</span> <span style="color: #d3869b;">Bool</span>,
+        (<span style="color: #d3869b;">InterpretScope</span>,
+          <span style="color: #d3869b;">InterpretStVal</span> <span style="color: #d3869b;">Bool</span>)))
+
+<span style="color: #b8bb26;">-- | A handler for computations possibly featuring 'get', 'put', and 'scope'.</span>
+<span style="color: #fabd2f;">getPutScopeHandler</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">GetPutScopeHandler</span>
+<span style="color: #fabd2f;">getPutScopeHandler</span> <span style="color: #83a598;">=</span> (interpretStGet,
+                       (interpretStPut,
+                         (interpretStScope,
+                           interpretStVal)))
+</pre>
+</div>
+
+<p>
+In order to correctly retrieve an interpreter from a handler, we must define the following instances of the <i>Retrievable</i> class in Haskell (there are eleven total!).<sup><a id="fnr.8" class="footref" href="#fn.8">8</a></sup>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | When a handler has only one component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> interpreter interpreter <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> id
+
+<span style="color: #b8bb26;">-- | Access the first component of a handler.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> interpreter (interpreter, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> fst
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve an interpreter from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStVal</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStVal</span> v) (<span style="color: #d3869b;">InterpretGet</span> v, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStVal</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStVal</span> v) (<span style="color: #d3869b;">InterpretPut</span> v, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStVal</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStVal</span> v) (<span style="color: #d3869b;">InterpretScope</span>, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretGet</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretGet</span> v) (<span style="color: #d3869b;">InterpretPut</span> v, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretGet</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretGet</span> v) (<span style="color: #d3869b;">InterpretScope</span>, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretPut</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretPut</span> v) (<span style="color: #d3869b;">InterpretGet</span> v, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretPut</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretPut</span> v) (<span style="color: #d3869b;">InterpretScope</span>, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> <span style="color: #d3869b;">InterpretScope</span> handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> <span style="color: #d3869b;">InterpretScope</span> (<span style="color: #d3869b;">InterpretGet</span> v, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+
+<span style="color: #b8bb26;">-- | Look past the first component to retrieve a handler from inside the</span>
+<span style="color: #b8bb26;">-- second component.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> <span style="color: #d3869b;">InterpretScope</span> handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Retrievable</span> <span style="color: #d3869b;">InterpretScope</span> (<span style="color: #d3869b;">InterpretPut</span> v, handler) <span style="color: #fb4933;">where</span>
+  retrieve <span style="color: #83a598;">=</span> retrieve <span style="color: #83a598;">.</span> snd
+</pre>
+</div>
+
+<p>
+With these components, defining a handler for our effects is straightforward. In particular, we may define the following partial function, \(\mathtt{handle}\), from tuples to &lambda;-terms.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{handle} &: m_1 \times \ldots \times m_{|I|} \times n \rightarrow \mathcal{F}_{l_{in}}(v_{in}) \rightarrow \mathcal{F}_{l_{out}}(v_{out})
+\end{align*}\]
+</p>
+
+<p>
+As in &sect;<a href="#orgef3a691">1</a>, the semantics of effect handling is defined by an <i>injection</i> case and an <i>operation</i> case. These correspond to the following two definitions of \(\mathtt{handle}\), depending on whether the computation it handles invokes operations or merely returns a value. (Note that we're ignoring the case in which a handler passes over an operation it doesn't handle, since it is currently irrelevant for our purposes.)
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{handle} h v &= \mathtt{retrieve} h v\tag{injection}\\
+\mathtt{handle} h m &= m (\lambda p, k.\mathtt{retrieve} h p (\lambda a.\mathtt{handle} h (k a)))\tag{operation}
+\end{align*}\]
+</p>
+
+<p>
+In Haskell, we may define a corresponding <i>Handleable</i> class, along with the two relevant instances for injections and operations (note that we invoke type applications, along with the <i>ScopedTypeVariables</i> language extension, to fix the right type for \(\mathtt{retrieve}\) when handling an operation).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | The class of handleable effects. Handle a computation associated with the</span>
+<span style="color: #b8bb26;">-- list of effects l1 and value type v1 to turn it into a computation associated</span>
+<span style="color: #b8bb26;">-- with the list of effects l2 and value type v2, in a way that depends on the</span>
+<span style="color: #b8bb26;">-- given handler.</span>
+<span style="color: #fb4933;">class</span> <span style="color: #d3869b;">Handleable</span> handler l1 l2 v1 v2 <span style="color: #fb4933;">where</span>
+  handle <span style="color: #83a598;">::</span> handler <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l1 v1 <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l2 v2
+
+<span style="color: #b8bb26;">-- | Handle a value.</span>
+<span style="color: #fb4933;">instance</span> <span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStVal</span> v) handler
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Handleable</span> handler '<span style="color: #d3869b;">[]</span> '[<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>] v v <span style="color: #fb4933;">where</span>
+  handle handler (<span style="color: #d3869b;">Pure</span> v) <span style="color: #83a598;">=</span> retrieve handler v
+
+<span style="color: #b8bb26;">-- | Handle an operation.</span>
+<span style="color: #fb4933;">instance</span> (<span style="color: #d3869b;">Retrievable</span> (<span style="color: #d3869b;">InterpretStOp</span> p a v) handler,
+          <span style="color: #d3869b;">Handleable</span> handler l '[<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>] v v)
+      <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">Handleable</span> handler (p <span style="color: #83a598;">&gt;--</span> a '<span style="color: #d3869b;">:</span> l)
+         '[<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>] v v <span style="color: #fb4933;">where</span>
+  handle handler (<span style="color: #d3869b;">Impure</span> m)
+    <span style="color: #83a598;">=</span> m <span style="color: #83a598;">$</span> <span style="color: #83a598;">\</span>p k <span style="color: #83a598;">-&gt;</span> retrieve <span style="color: #83a598;">@</span>(<span style="color: #d3869b;">InterpretStOp</span> p a v) handler
+                  p (<span style="color: #83a598;">\</span>a <span style="color: #83a598;">-&gt;</span> handle handler (k a))
+</pre>
+</div>
+
+<p>
+At the end of the day, we may define the handler for our fragment as a family of &lambda;-terms indexed by the set \(\{\star ⤚ \gamma, \gamma ⤚ \star, (e \rightarrow t) \rightarrow t ⤚ e\}^*\), i.e., of effects built up only from the types associated with our three operations. Given an effect \(l\) from this set, we may define our handler as follows.
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{handleSentence}_l &: \mathcal{F}_l(t) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
+\mathtt{handleSentence}_l &= \mathtt{handle}\ \mathtt{getPutScopeHandler}
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Handle a sentence with effects, using a 'GetPutScopeHandler'.</span>
+<span style="color: #fabd2f;">handleSentence</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">Handleable</span> <span style="color: #d3869b;">GetPutScopeHandler</span> l
+                  '[<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>] <span style="color: #d3869b;">Bool</span> <span style="color: #d3869b;">Bool</span>
+               <span style="color: #83a598;">=&gt;</span> <span style="color: #d3869b;">F</span> l <span style="color: #d3869b;">Bool</span> <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> '[<span style="color: #d3869b;">()</span> <span style="color: #83a598;">&gt;--</span> [<span style="color: #d3869b;">Entity</span>], [<span style="color: #d3869b;">Entity</span>] <span style="color: #83a598;">&gt;--</span> <span style="color: #d3869b;">()</span>] <span style="color: #d3869b;">Bool</span>
+<span style="color: #fabd2f;">handleSentence</span> <span style="color: #83a598;">=</span> handle getPutScopeHandler
+</pre>
+</div>
+
+<p>
+Note that, because the handler handles quantifier meanings, it is only applicable at computations with return values of type \(t\). That said, any given effect from the set above will determine a handler. As an example, let's take the case of a computation with one \(\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e}\), i.e., whose effect is just the singleton \((e \rightarrow t) \rightarrow t ⤚ e\).
+</p>
+
+<p>
+\[\begin{align*}
+&\mathtt{handleSentence}_{(e \rightarrow t) \rightarrow t ⤚ e} : \mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e}(t) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
+&\mathtt{handleSentence}_{(e \rightarrow t) \rightarrow t ⤚ e} m\\
+=\ \ &\mathtt{handle}\ \mathtt{getPutScopeHandler}\ m\\
+=\ \ &m (\lambda q, k.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ q\ (\lambda x.\mathtt{handle}\ \mathtt{getPutScopeHandler}\ (k x)))\\
+=\ \ &m (\lambda q, k.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ q\ (\lambda x.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ (k x)))\\
+=\ \ &m (\lambda q, k.\mathtt{retrieve}\ \mathtt{getPutScopeHandler}\ q\ (\lambda x.\mathtt{interpretStVal}\ (k x)))\\
+=\ \ &m (\lambda q, k.\mathtt{interpretStScope}\ q\ (\lambda x.\mathtt{interpretStVal}\ (k x)))\\
+=\ \ &m (\lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.\mathtt{interpretStVal}\ (k x) (\lambda\star, k^\prime.k^\prime g (\lambda g^\prime, k^{\prime\prime}.k^{\prime\prime} \star))))))\\
+=\ \ &m (\lambda q, k, h.h \star (\lambda g, h^\prime.h^\prime g (\lambda\star.q (\lambda x.k x))))\\
+=\ \ &m (\lambda q, k.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.q (\lambda x.k x))))
+\end{align*}\]
+</p>
+
+<p>
+Note that, in this case, the type of \(m\) is
+</p>
+
+<p>
+\[\begin{align*}
+&(((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow \mathcal{F}_\epsilon(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\\
+=\ \ &(((e \rightarrow t) \rightarrow t) \rightarrow (e \rightarrow t) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)) \rightarrow \mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)
+\end{align*}\]
+</p>
+
+<p>
+so that the result type \(o\) is fixed to \(\mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star}(t)\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4bb434c" class="outline-2">
+<h2 id="org4bb434c"><span class="section-number-2">3</span> A linguistic example<a id="org4e30ec2"></a></h2>
+<div class="outline-text-2" id="text-3">
+<p>
+In this section, I'll present a small linguistic example to illustrate the algebraic effects approach and, crucially, the dynamic property of quantifiers mentioned. We'll consider, in particular, the following two sentences, which differ in their in their dynamic behavior.
+</p>
+
+<ol class="org-ol">
+<li>Every postdoc cited herself.<a id="orge599154"></a></li>
+<li>Ashley cited herself.<a id="orgba29b22"></a></li>
+</ol>
+</div>
+
+<div id="outline-container-org11f0d99" class="outline-3">
+<h3 id="org11f0d99"><span class="section-number-3">3.1</span> Lexicon</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Let's first introduce a lexicon of English, complete with denotations as simply typed &lambda;-terms. To analyze anaphora, we'll use the \(\mathtt{sel}\) function of [<a href="#degroote_towards_2006">de&nbsp;Groote, 2006</a>], which retrieves an individual from the environment (and is thus of type \(\gamma \rightarrow e\)).
+</p>
+
+<p>
+\[\begin{align*}
+\mathtt{every} &: (e \rightarrow t) \rightarrow \mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e}(e)\\
+\mathtt{every} &= \lambda p.\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : p x\ \rightarrow\ k x)\\
+&= \lambda p, h.h\ (\lambda k.\forall x : p x\ \rightarrow\ k x)\ (\lambda y.y)\\[3mm]
+\mathtt{herself} &: \mathcal{F}_{\star ⤚ \gamma}(e)\\
+\mathtt{herself} &= \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{sel} g)\\
+&= \lambda h.h \star (\lambda g.\mathtt{sel} g)\\[3mm]
+(\cdot)^\triangleright &: \mathcal{F}_l e \rightarrow \mathcal{F}_{l, \star ⤚ \gamma, \gamma ⤚ \star}(e)\tag{bind}\\
+m^\triangleright &= m \bind \lambda x.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{x}{g}; \lambda\star.x))\\
+&= m \bind \lambda x, h.h \star (\lambda g, h^\prime.h^\prime (\append{x}{g}) (\lambda\star.x))\\[3mm]
+\mathtt{postdoc} &: e \rightarrow t\\
+\mathtt{postdoc} &= \textbf{pd}\\[3mm]
+\mathtt{cited} &: \mathcal{F}_\epsilon(e \rightarrow e \rightarrow t)\\
+\mathtt{cited} &= \textbf{cite}^\eta\\[3mm]
+\mathtt{ashley} &: \mathcal{F}_\epsilon(e)\\
+\mathtt{ashley} &= \textbf{a}^\eta
+\end{align*}\]
+</p>
+</div>
+</div>
+
+<div id="outline-container-org09e8b8b" class="outline-3">
+<h3 id="org09e8b8b"><span class="section-number-3">3.2</span> Grammar</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Additionally, we'll need versions of forward and backward Functional Application, which we present in terms of \(\mathtt{map}_{\mathcal{F}_l}\) and an operator \(\mu\) (called 'join'). This presentation is necessary for Haskell to infer the correct type for the application combinators and is equivalent to the presentation in terms of \(\bind\) and \((\cdot)^\eta\).
+</p>
+
+<p>
+\[\begin{align*}
+\mu &: \mathcal{F}_{l_1}(\mathcal{F}_{l_2}(v)) \rightarrow \mathcal{F}_{l_1,l_2}(v)\tag{join}\\
+\mu m &= m \bind \lambda n.n
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Graded monadic 'join'.</span>
+<span style="color: #fabd2f;">join</span> <span style="color: #83a598;">::</span> <span style="color: #d3869b;">F</span> l1 (<span style="color: #d3869b;">F</span> l2 v) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> (l1 <span style="color: #d3869b;">:++</span> l2) v
+<span style="color: #fabd2f;">join</span> m <span style="color: #83a598;">=</span> m <span style="color: #83a598;">&gt;&gt;=</span> id
+</pre>
+</div>
+
+<p>
+\[\begin{align*}
+(\triangleright) &: \mathcal{F}_{l_1}(v \rightarrow w) \rightarrow \mathcal{F}_{l_2}(v) \rightarrow \mathcal{F}_{l_1, l_2}(w)\tag{forward application}\\
+m \triangleright n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda f.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda x.f x)\ n)\ m)\\[3mm]
+(\triangleleft) &: \mathcal{F}_{l_1}(v) \rightarrow \mathcal{F}_{l_2}(v \rightarrow w) \rightarrow \mathcal{F}_{l_1, l_2}(w)\tag{backward application}\\
+m \triangleleft n &= \mu\ (\mathtt{map}_{\mathcal{F}_{l_1}} (\lambda x.\mathtt{map}_{\mathcal{F}_{l_2}} (\lambda f.f x)\ n)\ m)
+\end{align*}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #b8bb26;">-- | Forward application</span>
+(<span style="color: #fabd2f;">|&gt;</span>) <span style="color: #83a598;">::</span> <span style="color: #d3869b;">F</span> l1 (v <span style="color: #83a598;">-&gt;</span> w) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l2 v <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> (l1 <span style="color: #d3869b;">:++</span> l2) w
+<span style="color: #fabd2f;">m</span> <span style="color: #fabd2f;">|&gt;</span> n <span style="color: #83a598;">=</span> join <span style="color: #83a598;">$</span> fmap (<span style="color: #83a598;">\</span>f <span style="color: #83a598;">-&gt;</span> fmap (<span style="color: #83a598;">\</span>x <span style="color: #83a598;">-&gt;</span> f x) n) m
+
+<span style="color: #b8bb26;">-- | Backward application</span>
+(<span style="color: #fabd2f;">&lt;|</span>) <span style="color: #83a598;">::</span> <span style="color: #d3869b;">F</span> l1 v <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> l2 (v <span style="color: #83a598;">-&gt;</span> w) <span style="color: #83a598;">-&gt;</span> <span style="color: #d3869b;">F</span> (l1 <span style="color: #d3869b;">:++</span> l2) w
+m <span style="color: #fabd2f;">&lt;|</span> n <span style="color: #83a598;">=</span> join <span style="color: #83a598;">$</span> fmap (<span style="color: #83a598;">\</span>x <span style="color: #83a598;">-&gt;</span> fmap (<span style="color: #83a598;">\</span>f <span style="color: #83a598;">-&gt;</span> f x) n) m
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7e4c0a4" class="outline-3">
+<h3 id="org7e4c0a4"><span class="section-number-3">3.3</span> Examples</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Let's first look at example <a href="#orge599154">1</a>.
+</p>
+
+<p>
+\[\begin{align*}
+&(\mathtt{every} \mathtt{postdoc})^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself})\\
+=\ \ &(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : \textbf{pd} x\ \rightarrow\ k x))^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself})\\
+=\ \ &(\mathtt{scope}^\prime_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : \textbf{pd} x\ \rightarrow k x))^\triangleright \triangleleft \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\textbf{cite} (\mathtt{sel} g))\\
+=\ \ &\mathtt{scope}_{(e \rightarrow t) \rightarrow t ⤚ e} (\lambda k.\forall x : \textbf{pd} x\ \rightarrow k x)\\
+&\hspace{1cm}(\lambda y.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{y}{g}; \lambda\star.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g^\prime.\textbf{cite} (\mathtt{sel} g^\prime) y))))
+\end{align*}\]
+</p>
+
+<p>
+As we can see by inspecting the operations present in the resulting &lambda;-term, the semantic type of <a href="#orge599154">1</a> is \(\mathcal{F}_{(e \rightarrow t) \rightarrow t ⤚ e, \star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ \ (t)\). Its side effects are, in order, to invoke a quantifier meaning, read the environment, update the environment with the variable bound by the quantifier, and, finally, to read the environment again to do anaphora.
+</p>
+
+<p>
+Example <a href="#orgba29b22">2</a> composes in a similar way.
+</p>
+
+<p>
+\[\begin{align*}
+&\mathtt{ashley}^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself})\\
+=\ \ &\mathtt{ashley}^\triangleright \triangleleft \mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\textbf{cite} (\mathtt{sel} g))\\
+=\ \ &\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{\textbf{a}}{g}; \lambda\star.\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g^\prime.\textbf{cite} (\mathtt{sel} g^\prime) \textbf{a})))
+\end{align*}\]
+</p>
+
+<p>
+In this case, the resulting type is simpler &#x2014; \(\mathcal{F}_{\star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ (t)\) &#x2014; as there is no quantifier. The environment is read, updated with \(\textbf{a}\), and then read again for anaphora.
+</p>
+
+<p>
+Of course these "meanings" are not enough; we need to handle them! Doing so will produce ordinary State-monadic meanings, which we may associate with truth conditions. Fortunately, both sentences are of the right value type (\(t\)) to be handled. In the case of example <a href="#orge599154">1</a>, we wish to derive the following.
+</p>
+
+<p>
+\[\mathtt{handleSentence}_{(e \rightarrow t) \rightarrow t ⤚ e, \star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ \ ((\mathtt{every} \mathtt{postdoc})^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself}))\]
+</p>
+
+<p>
+There is not enough space here to show how the handler is computed, as well as provide the relevant &beta;-reductions, so I'll leave that as an (extremely tedious) exercise for the reader. The simplified meaning which results, however, is the following one.
+</p>
+
+<p>
+\[\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(g; \lambda\star.\forall x.\textbf{pd} x \rightarrow \textbf{cite} (\mathtt{sel} (\append{x}{g})) x))\]
+</p>
+
+<p>
+This meaning is equivalent to the State monadic program \(\lambda g.\langle\forall x.\textbf{pd} x \rightarrow \textbf{cite} (\mathtt{sel} (\append{x}{g})) x, g\rangle\); as required, it is externally static.
+</p>
+
+<p>
+Likewise, we wish to derive the following interpreted meaning for example <a href="#orgba29b22">2</a>.
+</p>
+
+<p>
+\[\mathtt{handleSentence}_{\star ⤚ \gamma, \gamma ⤚ \star, \star ⤚ \gamma}\ \ (\mathtt{ashley}^\triangleright \triangleleft (\mathtt{cited} \triangleright \mathtt{herself}))\]
+</p>
+
+<p>
+In this case, the simplified meaning which results is the following.
+</p>
+
+<p>
+\[\mathtt{get}_{\star ⤚ \gamma}(\star; \lambda g.\mathtt{put}_{\gamma ⤚ \star}(\append{\textbf{a}}{g}; \lambda\star.\textbf{cite} (\mathtt{sel} (\append{\textbf{a}}{g})) \textbf{a}))\]
+</p>
+
+<p>
+This meaning is equivalent to the State-monadic program \(\lambda g.\langle\textbf{cite} (\mathtt{sel} (\append{\textbf{a}}{g})) \textbf{a}, \append{\textbf{a}}{g}\rangle\); it is thus externally dynamic, in contrast to the meaning of example <a href="#orge599154">1</a>.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org74b9a22" class="outline-2">
+<h2 id="org74b9a22"><span class="section-number-2">4</span> Summary</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+The first part of this post (&sect;<a href="#orgef3a691">1</a>) was an attempt to present algebraic effects as an approach to natural language semantics, with special attention to Jirka Maršík's work. Maršík (as far as I know) has the most worked out, comprehensive framework for combining linguistic side effects from an algebraic perspective, as presented in <a href="https://hal.inria.fr/tel-01417467">his PhD thesis</a>. Indeed, he treats an array of phenomena that haven't been mentioned here, including presupposition and implicature, along with quantification and the dynamics of anaphora and indefiniteness.
+</p>
+
+<p>
+The second part of the post (&sect;<a href="#org3e84c51">2</a>) attempted to render the basic ideas behind these proposals in the simply typed &lambda;-calculus, relying on recursive definitions for computations and their handlers. In doing so, we presented operations for both state and quantification, as well as a means of handling complex, uninterpreted computations in a simple State-monadic algebra. One interesting consequence of this attempt is the dynamic properties of quantifiers, which arise simply from their types (\((e \rightarrow t) \rightarrow t\)), in combination with the choice of a State-monadic target algebra.
+</p>
+
+<p>
+There seem to be at least two features of the system presented that one could investigate. The first has to do with quantifier scope; in particular, why is it clause bounded? The answer which suggests itself (and which builds on Maršík's work, as well as [<a href="#charlow_semantics_2014">Charlow, 2014</a>]) is that sentence boundaries constitute domains for semantic evaluation. In [<a href="#charlow_semantics_2014">Charlow, 2014</a>], for example, continuized meanings, which are used to analyze quantification, are reset. This has the effect that quantifiers have clause bounded scope, while other sentence-level side effects are allowed to percolate up. In the present system, a similar explanation may become available for the difference between quantifiers and other sorts of "scope-takers" if evaluation is forced at sentence boundaries; in particular, we need only ensure that the target algebra contains the effects registered by exceptional scope-takers (as we did for anaphora).
+</p>
+
+<p>
+The second feature has to do with the apparent independence between different side effects that the system makes available. In general, the source algebras in the algebraic effects framework are completely extensible; state and quantification, for example, were added to the grammar independently of each other, in terms of operations taking different parameters and arities. One may wonder what implications this observation has for semantic learning. Should different semantic phenomena (anaphora, quantification, etc.) be learnable independently of each other, such that, for example, the internal dynamism of quantifiers is predictable entirely by their type? Moreover, these issues seem to be complicated by the necessity for handlers, which may be what are truly being learned when one incorporates quantification into their grammar. The definitions of handlers do not always treat phenomena independently in the same way. 
+</p>
+
+<div id="bibliography">
+<h2>References</h2>
+
+<table>
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="bauer_what_2019">Bauer, 2019</a>]
+</td>
+<td class="bibtexitem">
+Bauer, A. (2019).
+ What is algebraic about algebraic effects and handlers?
+ <em>arXiv:1807.05923 [cs]</em>.
+ arXiv: 1807.05923.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#bauer_what_2019">bib</a>&nbsp;| 
+<a href="http://arxiv.org/abs/1807.05923">http</a>&nbsp;]
+<blockquote><font size="-1">
+This note recapitulates and expands the contents of a tutorial on the mathematical theory of algebraic effects and handlers which I gave at the Dagstuhl seminar 18172 "Algebraic effect handlers go mainstream". It is targeted roughly at the level of a doctoral student with some amount of mathematical training, or at anyone already familiar with algebraic effects and handlers as programming concepts who would like to know what they have to do with algebra. We draw an uninterrupted line of thought between algebra and computational effects. We begin on the mathematical side of things, by reviewing the classic notions of universal algebra: signatures, algebraic theories, and their models. We then generalize and adapt the theory so that it applies to computational effects. In the last step we replace traditional mathematical notation with one that is closer to programming languages.
+</font></blockquote>
+<blockquote><font size="-1">
+Keywords: 08A70, Computer Science - Logic in Computer Science, Computer Science - Programming Languages
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="brady_programming_2013">Brady, 2013</a>]
+</td>
+<td class="bibtexitem">
+Brady, E. (2013).
+ Programming and reasoning with algebraic effects and dependent types.
+ In <em>Proceedings of the 18th ACM SIGPLAN international
+  conference on Functional programming</em>, ICFP '13, pages 133--144, New
+  York, NY, USA. Association for Computing Machinery.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#brady_programming_2013">bib</a>&nbsp;| 
+<a href="http://dx.doi.org/10.1145/2500365.2500581">DOI</a>&nbsp;| 
+<a href="https://doi.org/10.1145/2500365.2500581">http</a>&nbsp;]
+<blockquote><font size="-1">
+One often cited benefit of pure functional programming is that pure code is easier to test and reason about, both formally and informally. However, real programs have side-effects including state management, exceptions and interactions with the outside world. Haskell solves this problem using monads to capture details of possibly side-effecting computations --- it provides monads for capturing state, I/O, exceptions, non-determinism, libraries for practical purposes such as CGI and parsing, and many others, as well as monad transformers for combining multiple effects. Unfortunately, useful as monads are, they do not compose very well. Monad transformers can quickly become unwieldy when there are lots of effects to manage, leading to a temptation in larger programs to combine everything into one coarse-grained state and exception monad. In this paper I describe an alternative approach based on handling algebraic effects, implemented in the IDRIS programming language. I show how to describe side effecting computations, how to write programs which compose multiple fine-grained effects, and how, using dependent types, we can use this approach to reason about states in effectful programs.
+</font></blockquote>
+<blockquote><font size="-1">
+Keywords: algebraic effects, dependent types
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="charlow_semantics_2014">Charlow, 2014</a>]
+</td>
+<td class="bibtexitem">
+Charlow, S. (2014).
+ <em>On the semantics of exceptional scope</em>.
+ PhD Thesis, NYU, New York.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#charlow_semantics_2014">bib</a>&nbsp;| 
+<a href="https://semanticsarchive.net/Archive/2JmMWRjY">http</a>&nbsp;]
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="charlow_static_2019">Charlow, 2019</a>]
+</td>
+<td class="bibtexitem">
+Charlow, S. (2019).
+ Static and dynamic exceptional scope.
+ Publisher: Rutgers University Published: LingBuzz.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#charlow_static_2019">bib</a>&nbsp;| 
+<a href="https://ling.auf.net/lingbuzz/004650">http</a>&nbsp;]
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="charlow_scope_2020">Charlow, 2020</a>]
+</td>
+<td class="bibtexitem">
+Charlow, S. (2020).
+ The scope of alternatives: indefiniteness and islands.
+ <em>Linguistics and Philosophy</em>, 43(4):427--472.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#charlow_scope_2020">bib</a>&nbsp;| 
+<a href="http://dx.doi.org/10.1007/s10988-019-09278-3">DOI</a>&nbsp;| 
+<a href="https://doi.org/10.1007/s10988-019-09278-3">http</a>&nbsp;]
+<blockquote><font size="-1">
+I argue that alternative-denoting expressions interact with their semantic context by taking scope. With an empirical focus on indefinites in English, I show how this approach improves on standard alternative-semantic architectures that use point-wise composition to subvert islands, as well as on in situ approaches to indefinites more generally. Unlike grammars based on point-wise composition, scope-based alternative management is thoroughly categorematic, doesn’t under-generate readings when multiple sources of alternatives occur on an island, and is compatible with standard treatments of binding. Unlike all in situ (pseudo-scope) treatments of indefinites, relying on a true scope mechanism prevents over-generation when an operator binds into an indefinite. My account relies only on function application, some mechanism for scope-taking, and two freely-applying type-shifters: the first is Karttunen’s (Linguist Philos 1(1):3–44, 1977. https://doi.org/10.1007/BF00351935) proto-question operator, aka Partee’s (in: Groenendijk, de Jongh, Stokhof (eds) Studies in discourse representation theory and the theory of generalized quantifiers, Foris, Dordrecht, 1986) IDENT, and the second can be factored out of extant approaches to the semantics of questions in the tradition of Karttunen (1977). These type-shifters form a decomposition of LIFT, the familiar function mapping values into scope-takers. Exceptional scope of alternative-generating expressions arises via (snowballing) scopal pied-piping: indefinites take scope over their island, which then itself takes scope.
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="degroote_towards_2006">de&nbsp;Groote, 2006</a>]
+</td>
+<td class="bibtexitem">
+de&nbsp;Groote, P. (2006).
+ Towards a Montagovian Account of Dynamics.
+ <em>Semantics and Linguistic Theory</em>, 16(0):1--16.
+ Number: 0.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#degroote_towards_2006">bib</a>&nbsp;| 
+<a href="http://dx.doi.org/10.3765/salt.v16i0.2952">DOI</a>&nbsp;| 
+<a href="https://journals.linguisticsociety.org/proceedings/index.php/SALT/article/view/2952">http</a>&nbsp;]
+<blockquote><font size="-1">
+No abstract.
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="kiselyov_freer_2015">Kiselyov and Ishii, 2015</a>]
+</td>
+<td class="bibtexitem">
+Kiselyov, O. and Ishii, H. (2015).
+ Freer monads, more extensible effects.
+ <em>ACM SIGPLAN Notices</em>, 50(12):94--105.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#kiselyov_freer_2015">bib</a>&nbsp;| 
+<a href="http://dx.doi.org/10.1145/2887747.2804319">DOI</a>&nbsp;| 
+<a href="https://doi.org/10.1145/2887747.2804319">http</a>&nbsp;]
+<blockquote><font size="-1">
+We present a rational reconstruction of extensible effects, the recently proposed alternative to monad transformers, as the confluence of efforts to make effectful computations compose. Free monads and then extensible effects emerge from the straightforward term representation of an effectful computation, as more and more boilerplate is abstracted away. The generalization process further leads to freer monads, constructed without the Functor constraint. The continuation exposed in freer monads can then be represented as an efficient type-aligned data structure. The end result is the algorithmically efficient extensible effects library, which is not only more comprehensible but also faster than earlier implementations. As an illustration of the new library, we show three surprisingly simple applications: non-determinism with committed choice (LogicT), catching IO exceptions in the presence of other effects, and the semi-automatic management of file handles and other resources through monadic regions. We extensively use and promote the new sort of `laziness', which underlies the left Kan extension: instead of performing an operation, keep its operands and pretend it is done.
+</font></blockquote>
+<blockquote><font size="-1">
+Keywords: coroutine, effect handler, effect interaction, open union, type and effect system, free monad, Kan extension
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="kiselyov_extensible_2013">Kiselyov et&nbsp;al., 2013</a>]
+</td>
+<td class="bibtexitem">
+Kiselyov, O., Sabry, A., and Swords, C. (2013).
+ Extensible effects: an alternative to monad transformers.
+ In <em>Proceedings of the 2013 ACM SIGPLAN symposium on
+  Haskell</em>, Haskell '13, pages 59--70, New York, NY, USA. Association for
+  Computing Machinery.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#kiselyov_extensible_2013">bib</a>&nbsp;| 
+<a href="http://dx.doi.org/10.1145/2503778.2503791">DOI</a>&nbsp;| 
+<a href="https://doi.org/10.1145/2503778.2503791">http</a>&nbsp;]
+<blockquote><font size="-1">
+We design and implement a library that solves the long-standing problem of combining effects without imposing restrictions on their interactions (such as static ordering). Effects arise from interactions between a client and an effect handler (interpreter); interactions may vary throughout the program and dynamically adapt to execution conditions. Existing code that relies on monad transformers may be used with our library with minor changes, gaining efficiency over long monad stacks. In addition, our library has greater expressiveness, allowing for practical idioms that are inefficient, cumbersome, or outright impossible with monad transformers. Our alternative to a monad transformer stack is a single monad, for the coroutine-like communication of a client with its handler. Its type reflects possible requests, i.e., possible effects of a computation. To support arbitrary effects and their combinations, requests are values of an extensible union type, which allows adding and, notably, subtracting summands. Extending and, upon handling, shrinking of the union of possible requests is reflected in its type, yielding a type-and-effect system for Haskell. The library is lightweight, generalizing the extensible exception handling to other effects and accurately tracking them in types.
+</font></blockquote>
+<blockquote><font size="-1">
+Keywords: coroutine, effect handler, effect interaction, monad, monad transformer, open union, type and effect system
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="marsik_effects_2016">Maršík, 2016</a>]
+</td>
+<td class="bibtexitem">
+Maršík, J. (2016).
+ <em>Effects and handlers in natural language</em>.
+ phdthesis, Université de Lorraine.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#marsik_effects_2016">bib</a>&nbsp;| 
+<a href="https://hal.inria.fr/tel-01417467">http</a>&nbsp;]
+<blockquote><font size="-1">
+In formal semantics, researchers assign meanings to sentences of a natural language. This work is guided by the principle of compositionality: the meaning of an expression is a function of the meanings of its parts. These functions are often formalized using the [lambda]-calculus. However, there are areas of language which challenge the notion of compositionality, e.g. anaphoric pronouns or presupposition triggers. These force researchers to either abandon compositionality or adjust the structure of meanings. In the first case, meanings are derived by processes that no longer correspond to pure mathematical functions but rather to context-sensitive procedures, much like the functions of a programming language that manipulate their context with side effects. In the second case, when the structure of meanings is adjusted, the new meanings tend to be instances of the same mathematical structure, the monad. Monads themselves being widely used in functional programming to encode side effects, the common theme that emerges in both approaches is the introduction of side effects. Furthermore, different problems in semantics lead to different theories which are challenging to unite. Our thesis claims that by looking at these theories as theories of side effects, we can reuse results from programming language research to combine them.This thesis extends [lambda]-calculus with a monad of computations. The monad implements effects and handlers, a recent technique in the study of programming language side effects. In the first part of the thesis, we prove some of the fundamental properties of this calculus: subject reduction, confluence and termination. Then in the second part, we demonstrate how to use the calculus to implement treatments of several linguistic phenomena: deixis, quantification, conventional implicature, anaphora and presupposition. In the end, we build a grammar that features all of these phenomena and their interactions.
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="marsik_algebraic_2014">Maršík and Amblard, 2014</a>]
+</td>
+<td class="bibtexitem">
+Maršík, J. and Amblard, M. (2014).
+ Algebraic Effects and Handlers in Natural Language
+  Interpretation.
+ In Paiva, V.&nbsp;d., Neuper, W., Quaresma, P., Retoré, C., Moss, L.&nbsp;S.,
+  and Saludes, J., editors, <em>Natural Language and Computer Science</em>,
+  volume TR 2014-002 of <em>Joint Proceedings of the Second Workshop on
+  Natural Language and Computer Science (NLCS'14) &amp; 1st
+  International Workshop on Natural Language Services for Reasoners
+  (NLSR 2014)</em>, Vienne, Austria. Center for Informatics and Systems of the
+  University of Coimbra.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#marsik_algebraic_2014">bib</a>&nbsp;| 
+<a href="https://hal.archives-ouvertes.fr/hal-01079206">http</a>&nbsp;]
+<blockquote><font size="-1">
+Phenomena on the syntax-semantics interface of natural languages have been observed to have links with programming language semantics, namely computa- tional effects and evaluation order. We explore this connection to be able to profit from recent development in the study of effects. We propose adopting algebraic effects and handlers as tools for facilitating a uniform and integrated treatment of different non-compositional phenomena on the syntax-semantics interface.
+In this paper, we give an exposition of the framework of algebraic effects and handlers with an eye towards its applicability in computational semantics. We then present some exemplary analyses in the framework: we study the interplay of anaphora and quantification by translating the continuation-based dynamic logic of de Groote into a more DRT-like theory and we propose a treatment of overt wh-movement which avoids higher-order types in the syntax.
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="marsik_introducing_2016">Maršík and Amblard, 2016</a>]
+</td>
+<td class="bibtexitem">
+Maršík, J. and Amblard, M. (2016).
+ Introducing a Calculus of Effects and Handlers for Natural
+  Language Semantics.
+ In Foret, A., Morrill, G., Muskens, R., Osswald, R., and Pogodalla,
+  S., editors, <em>Formal Grammar</em>, Lecture Notes in Computer Science,
+  pages 257--272, Berlin, Heidelberg. Springer.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#marsik_introducing_2016">bib</a>&nbsp;| 
+<a href="http://dx.doi.org/10.1007/978-3-662-53042-9_15">DOI</a>&nbsp;]
+<blockquote><font size="-1">
+In compositional model-theoretic semantics, researchers assemble truth-conditions or other kinds of denotations using the lambda calculus. It was previously observed [26] that the lambda terms and/or the denotations studied tend to follow the same pattern: they are instances of a monad. In this paper, we present an extension of the simply-typed lambda calculus that exploits this uniformity using the recently discovered technique of effect handlers [22]. We prove that our calculus exhibits some of the key formal properties of the lambda calculus and we use it to construct a modular semantics for a small fragment that involves multiple distinct semantic phenomena.
+</font></blockquote>
+<blockquote><font size="-1">
+Keywords: Compositionality, Conventional implicature, Deixis, Handlers, Monads, Side effects
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="orchard_embedding_2014">Orchard and Petricek, 2014</a>]
+</td>
+<td class="bibtexitem">
+Orchard, D. and Petricek, T. (2014).
+ Embedding effect systems in Haskell.
+ <em>ACM SIGPLAN Notices</em>, 49(12):13--24.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#orchard_embedding_2014">bib</a>&nbsp;| 
+<a href="http://dx.doi.org/10.1145/2775050.2633368">DOI</a>&nbsp;| 
+<a href="https://doi.org/10.1145/2775050.2633368">http</a>&nbsp;]
+<blockquote><font size="-1">
+Monads are now an everyday tool in functional programming for abstracting and delimiting effects. The link between monads and effect systems is well-known, but in their typical use, monads provide a much more coarse-grained view of effects. Effect systems capture fine-grained information about the effects, but monads provide only a binary view: effectful or pure. Recent theoretical work has unified fine-grained effect systems with monads using a monad-like structure indexed by a monoid of effect annotations (called parametric effect monads). This aligns the power of monads with the power of effect systems. This paper leverages recent advances in Haskell's type system (as provided by GHC) to embed this approach in Haskell, providing user-programmable effect systems. We explore a number of practical examples that make Haskell even better and safer for effectful programming. Along the way, we relate the examples to other concepts, such as Haskell's implicit parameters and coeffects.
+</font></blockquote>
+<blockquote><font size="-1">
+Keywords: effect systems, parametric effect monads, type systems
+</font></blockquote>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="shan_monads_2002">Shan, 2002</a>]
+</td>
+<td class="bibtexitem">
+Shan, C.-c. (2002).
+ Monads for natural language semantics.
+ <em>arXiv:cs/0205026</em>.
+ arXiv: cs/0205026.
+[&nbsp;<a href="algebraic_effects_montague_bib.html#shan_monads_2002">bib</a>&nbsp;| 
+<a href="http://arxiv.org/abs/cs/0205026">http</a>&nbsp;]
+<blockquote><font size="-1">
+Accounts of semantic phenomena often involve extending types of meanings and revising composition rules at the same time. The concept of monads allows many such accounts -- for intensionality, variable binding, quantification and focus -- to be stated uniformly and compositionally.
+</font></blockquote>
+<blockquote><font size="-1">
+Keywords: Computer Science - Programming Languages, Computer Science - Computation and Language, D.3.1, F.3.2, I.2.7
+</font></blockquote>
+
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">Implementations in Haskell have generally gone by the title "extensible effects". See the libraries described in [<a href="#kiselyov_extensible_2013">Kiselyov et&nbsp;al., 2013</a>] and [<a href="#kiselyov_freer_2015">Kiselyov and Ishii, 2015</a>], as well as the <a href="https://github.com/hasura/eff">eff</a> library, for some examples. Algebraic effects and handlers have received implementations in other languages too, both pure and impure; e.g., see [<a href="#brady_programming_2013">Brady, 2013</a>] for Idris.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><p class="footpara">One can browse Haskell's popular <a href="http://hackage.haskell.org/package/mtl">Monad Transformers Library</a> for more details.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <div class="footpara"><p class="footpara">Maršík also provides a set-theoretic denotational semantics for his calculus in chapter 3 of <a href="https://hal.inria.fr/tel-01417467">his thesis</a>. It is not obvious, however, that this semantics can be given a simply typed encoding, at least not without special axioms; his \(\mathcal{C}\) combinator, for instance, is a partial function.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> <div class="footpara"><p class="footpara">Maršík provides an operator called \(\mathtt{scope}\) with a similar purpose; its type is crucially different, however, insofar as he divides the work up differently between the operator and its handler.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5">5</a></sup> <div class="footpara"><p class="footpara">See [<a href="#shan_monads_2002">Shan, 2002</a>] and [<a href="#charlow_semantics_2014">Charlow, 2014</a>] for general approaches along such lines.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6">6</a></sup> <div class="footpara"><p class="footpara">In particular, the laws entail that the parameters form a monoid, as stipulated.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.7" class="footnum" href="#fnr.7">7</a></sup> <div class="footpara"><p class="footpara">Such considerations suggest that indefinites, which give rise to exceptional scope, <i>should not</i> be analyzed as generalized quantifiers within our fragment, but, rather, as something else. It might be beneficial to try to add a version of non-determinism to the signature, in the vein of [<a href="#charlow_semantics_2014">Charlow, 2014</a>].</p></div></div>
+
+<div class="footdef"><sup><a id="fn.8" class="footnum" href="#fnr.8">8</a></sup> <div class="footpara"><p class="footpara">This number of instances may seem excessive, but it seems to be required to make the \(\mathtt{retrieve}\) operation as general as possible without incurring an <i>OverlappingInstances</i> violation.</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Julian Grove</p>
+<p class="date">Created: 2020-10-13 Tue 19:47</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

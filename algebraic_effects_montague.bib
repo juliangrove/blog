@@ -1,0 +1,206 @@
+
+@phdthesis{charlow_semantics_2014,
+	address = {New York},
+	type = {{PhD} {Thesis}},
+	title = {On the semantics of exceptional scope},
+	url = {https://semanticsarchive.net/Archive/2JmMWRjY},
+	school = {NYU},
+	author = {Charlow, Simon},
+	year = {2014}
+}
+
+@unpublished{charlow_static_2019,
+	title = {Static and dynamic exceptional scope},
+	url = {https://ling.auf.net/lingbuzz/004650},
+	author = {Charlow, Simon},
+	year = {2019},
+	note = {Publisher: Rutgers University
+Published: LingBuzz},
+	annote = {forthcoming in {\textbackslash}emphJournal of Semantics}
+}
+
+@inproceedings{marsik_algebraic_2014,
+	address = {Vienne, Austria},
+	series = {Joint {Proceedings} of the {Second} {Workshop} on {Natural} {Language} and {Computer} {Science} ({NLCS}'14) \& 1st {International} {Workshop} on {Natural} {Language} {Services} for {Reasoners} ({NLSR} 2014)},
+	title = {Algebraic {Effects} and {Handlers} in {Natural} {Language} {Interpretation}},
+	volume = {TR 2014-002},
+	url = {https://hal.archives-ouvertes.fr/hal-01079206},
+	abstract = {Phenomena on the syntax-semantics interface of natural languages have been observed to have links with programming language semantics, namely computa- tional effects and evaluation order. We explore this connection to be able to profit from recent development in the study of effects. We propose adopting algebraic effects and handlers as tools for facilitating a uniform and integrated treatment of different non-compositional phenomena on the syntax-semantics interface.
+In this paper, we give an exposition of the framework of algebraic effects and handlers with an eye towards its applicability in computational semantics. We then present some exemplary analyses in the framework: we study the interplay of anaphora and quantification by translating the continuation-based dynamic logic of de Groote into a more DRT-like theory and we propose a treatment of overt wh-movement which avoids higher-order types in the syntax.},
+	urldate = {2020-08-26},
+	booktitle = {Natural {Language} and {Computer} {Science}},
+	publisher = {Center for Informatics and Systems of the University of Coimbra},
+	author = {Maršík, Jiří and Amblard, Maxime},
+	editor = {Paiva, Valeria de and Neuper, Walther and Quaresma, Pedro and Retoré, Christian and Moss, Lawrence S. and Saludes, Jordi},
+	month = jul,
+	year = {2014}
+}
+
+@inproceedings{marsik_introducing_2016,
+	address = {Berlin, Heidelberg},
+	series = {Lecture {Notes} in {Computer} {Science}},
+	title = {Introducing a {Calculus} of {Effects} and {Handlers} for {Natural} {Language} {Semantics}},
+	isbn = {978-3-662-53042-9},
+	doi = {10.1007/978-3-662-53042-9_15},
+	abstract = {In compositional model-theoretic semantics, researchers assemble truth-conditions or other kinds of denotations using the lambda calculus. It was previously observed [26] that the lambda terms and/or the denotations studied tend to follow the same pattern: they are instances of a monad. In this paper, we present an extension of the simply-typed lambda calculus that exploits this uniformity using the recently discovered technique of effect handlers [22]. We prove that our calculus exhibits some of the key formal properties of the lambda calculus and we use it to construct a modular semantics for a small fragment that involves multiple distinct semantic phenomena.},
+	language = {en},
+	booktitle = {Formal {Grammar}},
+	publisher = {Springer},
+	author = {Maršík, Jirka and Amblard, Maxime},
+	editor = {Foret, Annie and Morrill, Glyn and Muskens, Reinhard and Osswald, Rainer and Pogodalla, Sylvain},
+	year = {2016},
+	keywords = {Compositionality, Conventional implicature, Deixis, Handlers, Monads, Side effects},
+	pages = {257--272}
+}
+
+@article{charlow_scope_2020,
+	title = {The scope of alternatives: indefiniteness and islands},
+	volume = {43},
+	issn = {1573-0549},
+	shorttitle = {The scope of alternatives},
+	url = {https://doi.org/10.1007/s10988-019-09278-3},
+	doi = {10.1007/s10988-019-09278-3},
+	abstract = {I argue that alternative-denoting expressions interact with their semantic context by taking scope. With an empirical focus on indefinites in English, I show how this approach improves on standard alternative-semantic architectures that use point-wise composition to subvert islands, as well as on in situ approaches to indefinites more generally. Unlike grammars based on point-wise composition, scope-based alternative management is thoroughly categorematic, doesn’t under-generate readings when multiple sources of alternatives occur on an island, and is compatible with standard treatments of binding. Unlike all in situ (pseudo-scope) treatments of indefinites, relying on a true scope mechanism prevents over-generation when an operator binds into an indefinite. My account relies only on function application, some mechanism for scope-taking, and two freely-applying type-shifters: the first is Karttunen’s (Linguist Philos 1(1):3–44, 1977. https://doi.org/10.1007/BF00351935) proto-question operator, aka Partee’s (in: Groenendijk, de Jongh, Stokhof (eds) Studies in discourse representation theory and the theory of generalized quantifiers, Foris, Dordrecht, 1986) IDENT, and the second can be factored out of extant approaches to the semantics of questions in the tradition of Karttunen (1977). These type-shifters form a decomposition of LIFT, the familiar function mapping values into scope-takers. Exceptional scope of alternative-generating expressions arises via (snowballing) scopal pied-piping: indefinites take scope over their island, which then itself takes scope.},
+	language = {en},
+	number = {4},
+	urldate = {2020-08-09},
+	journal = {Linguistics and Philosophy},
+	author = {Charlow, Simon},
+	month = aug,
+	year = {2020},
+	pages = {427--472}
+}
+
+@inproceedings{kiselyov_extensible_2013,
+	address = {New York, NY, USA},
+	series = {Haskell '13},
+	title = {Extensible effects: an alternative to monad transformers},
+	isbn = {978-1-4503-2383-3},
+	shorttitle = {Extensible effects},
+	url = {https://doi.org/10.1145/2503778.2503791},
+	doi = {10.1145/2503778.2503791},
+	abstract = {We design and implement a library that solves the long-standing problem of combining effects without imposing restrictions on their interactions (such as static ordering). Effects arise from interactions between a client and an effect handler (interpreter); interactions may vary throughout the program and dynamically adapt to execution conditions. Existing code that relies on monad transformers may be used with our library with minor changes, gaining efficiency over long monad stacks. In addition, our library has greater expressiveness, allowing for practical idioms that are inefficient, cumbersome, or outright impossible with monad transformers. Our alternative to a monad transformer stack is a single monad, for the coroutine-like communication of a client with its handler. Its type reflects possible requests, i.e., possible effects of a computation. To support arbitrary effects and their combinations, requests are values of an extensible union type, which allows adding and, notably, subtracting summands. Extending and, upon handling, shrinking of the union of possible requests is reflected in its type, yielding a type-and-effect system for Haskell. The library is lightweight, generalizing the extensible exception handling to other effects and accurately tracking them in types.},
+	urldate = {2020-08-29},
+	booktitle = {Proceedings of the 2013 {ACM} {SIGPLAN} symposium on {Haskell}},
+	publisher = {Association for Computing Machinery},
+	author = {Kiselyov, Oleg and Sabry, Amr and Swords, Cameron},
+	month = sep,
+	year = {2013},
+	keywords = {coroutine, effect handler, effect interaction, monad, monad transformer, open union, type and effect system},
+	pages = {59--70}
+}
+
+@phdthesis{marsik_effects_2016,
+	type = {phdthesis},
+	title = {Effects and handlers in natural language},
+	url = {https://hal.inria.fr/tel-01417467},
+	abstract = {In formal semantics, researchers assign meanings to sentences of a natural language. This work is guided by the principle of compositionality: the meaning of an expression is a function of the meanings of its parts. These functions are often formalized using the [lambda]-calculus. However, there are areas of language which challenge the notion of compositionality, e.g. anaphoric pronouns or presupposition triggers. These force researchers to either abandon compositionality or adjust the structure of meanings. In the first case, meanings are derived by processes that no longer correspond to pure mathematical functions but rather to context-sensitive procedures, much like the functions of a programming language that manipulate their context with side effects. In the second case, when the structure of meanings is adjusted, the new meanings tend to be instances of the same mathematical structure, the monad. Monads themselves being widely used in functional programming to encode side effects, the common theme that emerges in both approaches is the introduction of side effects. Furthermore, different problems in semantics lead to different theories which are challenging to unite. Our thesis claims that by looking at these theories as theories of side effects, we can reuse results from programming language research to combine them.This thesis extends [lambda]-calculus with a monad of computations. The monad implements effects and handlers, a recent technique in the study of programming language side effects. In the first part of the thesis, we prove some of the fundamental properties of this calculus: subject reduction, confluence and termination. Then in the second part, we demonstrate how to use the calculus to implement treatments of several linguistic phenomena: deixis, quantification, conventional implicature, anaphora and presupposition. In the end, we build a grammar that features all of these phenomena and their interactions.},
+	language = {en},
+	urldate = {2020-08-25},
+	school = {Université de Lorraine},
+	author = {Maršík, Jiří},
+	month = dec,
+	year = {2016}
+}
+
+@article{bauer_what_2019,
+	title = {What is algebraic about algebraic effects and handlers?},
+	url = {http://arxiv.org/abs/1807.05923},
+	abstract = {This note recapitulates and expands the contents of a tutorial on the mathematical theory of algebraic effects and handlers which I gave at the Dagstuhl seminar 18172 "Algebraic effect handlers go mainstream". It is targeted roughly at the level of a doctoral student with some amount of mathematical training, or at anyone already familiar with algebraic effects and handlers as programming concepts who would like to know what they have to do with algebra. We draw an uninterrupted line of thought between algebra and computational effects. We begin on the mathematical side of things, by reviewing the classic notions of universal algebra: signatures, algebraic theories, and their models. We then generalize and adapt the theory so that it applies to computational effects. In the last step we replace traditional mathematical notation with one that is closer to programming languages.},
+	urldate = {2020-09-08},
+	journal = {arXiv:1807.05923 [cs]},
+	author = {Bauer, Andrej},
+	month = mar,
+	year = {2019},
+	note = {arXiv: 1807.05923},
+	keywords = {08A70, Computer Science - Logic in Computer Science, Computer Science - Programming Languages},
+	file = {arXiv Fulltext PDF:/home/juliangrove/Documents/Zotero/storage/9BQNNC7A/Bauer - 2019 - What is algebraic about algebraic effects and hand.pdf:application/pdf;arXiv.org Snapshot:/home/juliangrove/Documents/Zotero/storage/8LVK8LWC/1807.html:text/html}
+}
+
+@article{kiselyov_freer_2015,
+	title = {Freer monads, more extensible effects},
+	volume = {50},
+	issn = {0362-1340},
+	url = {https://doi.org/10.1145/2887747.2804319},
+	doi = {10.1145/2887747.2804319},
+	abstract = {We present a rational reconstruction of extensible effects, the recently proposed alternative to monad transformers, as the confluence of efforts to make effectful computations compose. Free monads and then extensible effects emerge from the straightforward term representation of an effectful computation, as more and more boilerplate is abstracted away. The generalization process further leads to freer monads, constructed without the Functor constraint. The continuation exposed in freer monads can then be represented as an efficient type-aligned data structure. The end result is the algorithmically efficient extensible effects library, which is not only more comprehensible but also faster than earlier implementations. As an illustration of the new library, we show three surprisingly simple applications: non-determinism with committed choice (LogicT), catching IO exceptions in the presence of other effects, and the semi-automatic management of file handles and other resources through monadic regions. We extensively use and promote the new sort of `laziness', which underlies the left Kan extension: instead of performing an operation, keep its operands and pretend it is done.},
+	number = {12},
+	urldate = {2020-09-11},
+	journal = {ACM SIGPLAN Notices},
+	author = {Kiselyov, Oleg and Ishii, Hiromi},
+	month = aug,
+	year = {2015},
+	keywords = {coroutine, effect handler, effect interaction, open union, type and effect system, free monad, Kan extension},
+	pages = {94--105}
+}
+
+@inproceedings{brady_programming_2013,
+	address = {New York, NY, USA},
+	series = {{ICFP} '13},
+	title = {Programming and reasoning with algebraic effects and dependent types},
+	isbn = {978-1-4503-2326-0},
+	url = {https://doi.org/10.1145/2500365.2500581},
+	doi = {10.1145/2500365.2500581},
+	abstract = {One often cited benefit of pure functional programming is that pure code is easier to test and reason about, both formally and informally. However, real programs have side-effects including state management, exceptions and interactions with the outside world. Haskell solves this problem using monads to capture details of possibly side-effecting computations --- it provides monads for capturing state, I/O, exceptions, non-determinism, libraries for practical purposes such as CGI and parsing, and many others, as well as monad transformers for combining multiple effects. Unfortunately, useful as monads are, they do not compose very well. Monad transformers can quickly become unwieldy when there are lots of effects to manage, leading to a temptation in larger programs to combine everything into one coarse-grained state and exception monad. In this paper I describe an alternative approach based on handling algebraic effects, implemented in the IDRIS programming language. I show how to describe side effecting computations, how to write programs which compose multiple fine-grained effects, and how, using dependent types, we can use this approach to reason about states in effectful programs.},
+	urldate = {2020-09-12},
+	booktitle = {Proceedings of the 18th {ACM} {SIGPLAN} international conference on {Functional} programming},
+	publisher = {Association for Computing Machinery},
+	author = {Brady, Edwin},
+	month = sep,
+	year = {2013},
+	keywords = {algebraic effects, dependent types},
+	pages = {133--144},
+	file = {Submitted Version:/home/juliangrove/Documents/Zotero/storage/DAEIJ3DL/Brady - 2013 - Programming and reasoning with algebraic effects a.pdf:application/pdf}
+}
+
+@article{shan_monads_2002,
+	title = {Monads for natural language semantics},
+	url = {http://arxiv.org/abs/cs/0205026},
+	abstract = {Accounts of semantic phenomena often involve extending types of meanings and revising composition rules at the same time. The concept of monads allows many such accounts -- for intensionality, variable binding, quantification and focus -- to be stated uniformly and compositionally.},
+	urldate = {2020-10-06},
+	journal = {arXiv:cs/0205026},
+	author = {Shan, Chung-chieh},
+	month = may,
+	year = {2002},
+	note = {arXiv: cs/0205026},
+	keywords = {Computer Science - Programming Languages, Computer Science - Computation and Language, D.3.1, F.3.2, I.2.7},
+	file = {arXiv.org Snapshot:/home/juliangrove/Documents/Zotero/storage/NT923T65/Shan - 2002 - Monads for natural language semantics.html:text/html;arXiv Fulltext PDF:/home/juliangrove/Documents/Zotero/storage/QQNXMEAQ/Shan - 2002 - Monads for natural language semantics.pdf:application/pdf}
+}
+
+@article{orchard_embedding_2014,
+	title = {Embedding effect systems in {Haskell}},
+	volume = {49},
+	issn = {0362-1340},
+	url = {https://doi.org/10.1145/2775050.2633368},
+	doi = {10.1145/2775050.2633368},
+	abstract = {Monads are now an everyday tool in functional programming for abstracting and delimiting effects. The link between monads and effect systems is well-known, but in their typical use, monads provide a much more coarse-grained view of effects. Effect systems capture fine-grained information about the effects, but monads provide only a binary view: effectful or pure. Recent theoretical work has unified fine-grained effect systems with monads using a monad-like structure indexed by a monoid of effect annotations (called parametric effect monads). This aligns the power of monads with the power of effect systems. This paper leverages recent advances in Haskell's type system (as provided by GHC) to embed this approach in Haskell, providing user-programmable effect systems. We explore a number of practical examples that make Haskell even better and safer for effectful programming. Along the way, we relate the examples to other concepts, such as Haskell's implicit parameters and coeffects.},
+	number = {12},
+	urldate = {2020-10-12},
+	journal = {ACM SIGPLAN Notices},
+	author = {Orchard, Dominic and Petricek, Tomas},
+	month = sep,
+	year = {2014},
+	keywords = {effect systems, parametric effect monads, type systems},
+	pages = {13--24},
+	file = {Accepted Version:/home/juliangrove/Documents/Zotero/storage/WAKI5PQW/Orchard and Petricek - 2014 - Embedding effect systems in Haskell.pdf:application/pdf}
+}
+
+@article{degroote_towards_2006,
+	title = {Towards a {Montagovian} {Account} of {Dynamics}},
+	volume = {16},
+	copyright = {Copyright (c)},
+	issn = {2163-5951},
+	url = {https://journals.linguisticsociety.org/proceedings/index.php/SALT/article/view/2952},
+	doi = {10.3765/salt.v16i0.2952},
+	abstract = {No abstract.},
+	language = {en-US},
+	number = {0},
+	urldate = {2020-10-12},
+	journal = {Semantics and Linguistic Theory},
+	author = {de Groote, Philippe},
+	month = aug,
+	year = {2006},
+	note = {Number: 0},
+	pages = {1--16},
+	file = {Full Text PDF:/home/juliangrove/Documents/Zotero/storage/LUEL2MSV/Groote - 2006 - Towards a Montagovian Account of Dynamics.pdf:application/pdf;Snapshot:/home/juliangrove/Documents/Zotero/storage/W5V39NMG/2952.html:text/html}
+}
